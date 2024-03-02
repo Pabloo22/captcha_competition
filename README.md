@@ -7,7 +7,7 @@ The project structure of the project is based on the [Cookiecutter Data Science]
 Main details of the project structure:
 - Notebooks are used for exploratory data analysis, prototyping, visualizations, and debugging.
 - The `captcha_competition` directory contains the source code of the project.
-- Experiments are running in the `scripts` directory.
+- Experiments are run in the `scripts` directory.
 - The `data` directory contains the raw and processed data.
 - The `models` directory contains the trained models.
 - Hyperparameters and configurations are stored in the `config` directory as `.yaml` files.
