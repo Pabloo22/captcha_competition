@@ -1,0 +1,7 @@
+[MASTER]
+disable=
+    C0114, # missing-module-docstring
+    C0115, # missing-class-docstring
+    C0116, # missing-function-docstring
+    E1101, # no-member (disabled because of cv2)
+    C0103, # invalid-name (for X_train, and X_test, etc)
