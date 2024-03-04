@@ -33,15 +33,6 @@ def create_captcha_model(
     return model
 
 
-def convolutional_base(x):
-    x = convolutional_block(x, 32)
-    x = convolutional_block(x, 64)
-    x = convolutional_block(x, 128)
-    x = convolutional_block(x, 256)
-    x = convolutional_block(x, 512)
-    return x
-
-
 def resnet_base(input_tensor):
     x = Conv2D(64, (7, 7), strides=2, padding="same")(input_tensor)
     x = BatchNormalization()(x)
@@ -64,16 +55,9 @@ def resnet_base(input_tensor):
     return x
 
 
-def convolutional_block(x, filters):
-    x = Conv2D(filters, (3, 3), activation="relu", padding="same")(x)
-    x = Conv2D(filters, (3, 3), activation="relu", padding="same", strides=2)(
-        x
-    )
-    return x
-
-
 def resnet_block(x, filters, kernel_size=(3, 3), strides=2):
-    """A ResNet block with two convolutional layers and a shortcut connection."""
+    """A ResNet block with two convolutional layers and a shortcut connection.
+    """
     shortcut = x
 
     # First convolution
@@ -97,4 +81,21 @@ def resnet_block(x, filters, kernel_size=(3, 3), strides=2):
     x = Add()([x, shortcut])
     x = Activation("relu")(x)
 
+    return x
+
+
+def convolutional_base(x):
+    x = convolutional_block(x, 32)
+    x = convolutional_block(x, 64)
+    x = convolutional_block(x, 128)
+    x = convolutional_block(x, 256)
+    x = convolutional_block(x, 512)
+    return x
+
+
+def convolutional_block(x, filters):
+    x = Conv2D(filters, (3, 3), activation="relu", padding="same")(x)
+    x = Conv2D(filters, (3, 3), activation="relu", padding="same", strides=2)(
+        x
+    )
     return x
