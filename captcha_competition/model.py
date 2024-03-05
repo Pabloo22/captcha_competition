@@ -7,15 +7,17 @@ from keras.layers import (  # type: ignore
     Add,
     MaxPooling2D,
     Reshape,
+    ReLU,
+    DepthwiseConv2D,
 )
 
 
 def create_captcha_model(
-    input_shape=(192, 64, 3), num_digits=6, num_classes=10
+    input_shape=(192, 64, 3), num_digits=6, num_classes=10, conv_base="resnet"
 ):
     inputs = Input(shape=input_shape)
 
-    x = resnet_base(inputs)
+    x = convolutional_base_factory(conv_base)(inputs)
     x = Conv2D(num_classes, (3, 3), padding="same", strides=(1, 2))(x)
 
     # Assuming the output is (None, 6, 1, 10), we reshape it to (None, 6, 10)
@@ -31,6 +33,20 @@ def create_captcha_model(
     )
 
     return model
+
+
+def convolutional_base_factory(conv_base: str):
+    conv_bases = {
+        "resnet": resnet_base,
+        "efficientnet": efficientnet_base,
+    }
+    conv_base = conv_base.lower()
+    if conv_base in conv_bases:
+        return conv_bases[conv_base]
+
+    raise ValueError(
+        f"Unknown conv_base: {conv_base}. Available: {conv_bases.keys()}"
+    )
 
 
 def resnet_base(input_tensor):
@@ -55,9 +71,25 @@ def resnet_base(input_tensor):
     return x
 
 
+def efficientnet_base(input_tensor):
+
+    # Initial Convolution
+    x = Conv2D(32, kernel_size=3, strides=2, padding="same")(input_tensor)
+    x = BatchNormalization()(x)
+    x = ReLU()(x)
+
+    # Downsampling through MBConv blocks
+    x = mb_conv_block(x, filter_num=16, kernel_size=3, strides=2)
+    x = mb_conv_block(x, filter_num=24, kernel_size=3, strides=2)
+    x = mb_conv_block(x, filter_num=32, kernel_size=3, strides=2)
+    x = mb_conv_block(x, filter_num=64, kernel_size=3, strides=2)
+    x = mb_conv_block(x, filter_num=96, kernel_size=3, strides=2)
+
+    return x
+
+
 def resnet_block(x, filters, kernel_size=(3, 3), strides=2):
-    """A ResNet block with two convolutional layers and a shortcut connection.
-    """
+    """A ResNet block with two convolutional layers and a shortcut connection."""
     shortcut = x
 
     # First convolution
@@ -84,18 +116,18 @@ def resnet_block(x, filters, kernel_size=(3, 3), strides=2):
     return x
 
 
-def convolutional_base(x):
-    x = convolutional_block(x, 32)
-    x = convolutional_block(x, 64)
-    x = convolutional_block(x, 128)
-    x = convolutional_block(x, 256)
-    x = convolutional_block(x, 512)
-    return x
+def mb_conv_block(inputs, filter_num, kernel_size, strides):
+    """Mobile Inverted Bottleneck Convolution block."""
+    x = Conv2D(filter_num, kernel_size=1, strides=1, padding="same")(inputs)
+    x = BatchNormalization()(x)
+    x = ReLU()(x)
 
+    x = DepthwiseConv2D(
+        kernel_size=kernel_size, strides=strides, padding="same"
+    )(x)
+    x = BatchNormalization()(x)
+    x = ReLU()(x)
 
-def convolutional_block(x, filters):
-    x = Conv2D(filters, (3, 3), activation="relu", padding="same")(x)
-    x = Conv2D(filters, (3, 3), activation="relu", padding="same", strides=2)(
-        x
-    )
+    x = Conv2D(filter_num, kernel_size=1, strides=1, padding="same")(x)
+    x = BatchNormalization()(x)
     return x
