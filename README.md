@@ -43,3 +43,9 @@ poetry add <package>
 - Pablo Ariño
 - Álvaro Laguna
 - Carlota Medrano
+
+## Notes
+
+- When installing everything remember to cahnge the environment path to your own computer.
+- In order to add new fuctions, they must be added to the init.py
+
