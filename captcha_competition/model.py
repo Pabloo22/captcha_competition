@@ -1,20 +1,14 @@
-from keras.models import Model  # type: ignore
-from keras.layers import (  # type: ignore
-    Input,
-    Conv2D,
-    BatchNormalization,
-    Activation,
-    Add,
-    MaxPooling2D,
-    Reshape,
-    ReLU,
-    DepthwiseConv2D,
-)
-
-
 def create_captcha_model(
     input_shape=(192, 64, 3), num_digits=6, num_classes=10, conv_base="resnet"
 ):
+    from keras.models import Model  # type: ignore
+    from keras.layers import (  # type: ignore
+        Input,
+        Conv2D,
+        Activation,
+        Reshape,
+    )
+
     inputs = Input(shape=input_shape)
 
     x = convolutional_base_factory(conv_base)(inputs)
@@ -50,6 +44,13 @@ def convolutional_base_factory(conv_base: str):
 
 
 def resnet_base(input_tensor):
+    from keras.layers import (  # type: ignore
+        Conv2D,
+        BatchNormalization,
+        Activation,
+        MaxPooling2D,
+    )
+
     x = Conv2D(64, (7, 7), strides=2, padding="same")(input_tensor)
     x = BatchNormalization()(x)
     x = Activation("relu")(x)
@@ -72,6 +73,12 @@ def resnet_base(input_tensor):
 
 
 def efficientnet_base(input_tensor):
+    from keras.models import Model  # type: ignore
+    from keras.layers import (  # type: ignore
+        Conv2D,
+        BatchNormalization,
+        ReLU,
+    )
 
     # Initial Convolution
     x = Conv2D(32, kernel_size=3, strides=2, padding="same")(input_tensor)
@@ -90,6 +97,13 @@ def efficientnet_base(input_tensor):
 
 def resnet_block(x, filters, kernel_size=(3, 3), strides=2):
     """A ResNet block with two convolutional layers and a shortcut connection."""
+    from keras.layers import (  # type: ignore
+        Conv2D,
+        BatchNormalization,
+        Activation,
+        Add,
+    )
+
     shortcut = x
 
     # First convolution
@@ -118,6 +132,13 @@ def resnet_block(x, filters, kernel_size=(3, 3), strides=2):
 
 def mb_conv_block(inputs, filter_num, kernel_size, strides):
     """Mobile Inverted Bottleneck Convolution block."""
+    from keras.layers import (  # type: ignore
+        Conv2D,
+        BatchNormalization,
+        ReLU,
+        DepthwiseConv2D,
+    )
+
     x = Conv2D(filter_num, kernel_size=1, strides=1, padding="same")(inputs)
     x = BatchNormalization()(x)
     x = ReLU()(x)
