@@ -12,3 +12,4 @@ from .load_data import load_raw_data
 from .visualization import plot_image
 from .model import create_captcha_model, efficientnet_base, resnet_base
 from .generate_captcha import generate_captcha_image
+from .captcha_dataset import SyntheticCaptchaIterableDataset
