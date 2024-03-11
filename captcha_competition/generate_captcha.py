@@ -15,6 +15,7 @@ HEIGHT = 80
 NUM_NUMBERS = 6
 Y_CENTER = HEIGHT // 2
 FONT_SIZE = 64
+TENSOR_TYPE = torch.float32
 
 DIFF_BETWEEN_BACKGROUND_AND_NUMBER_COLORS = 40
 
@@ -31,12 +32,14 @@ def generate_captcha_tensors() -> tuple[torch.Tensor, torch.Tensor]:
 
 
 def label_to_tensor(label: list[int]) -> torch.Tensor:
-    # TODO: Implement this method
-    return torch.tensor(label)
+    label_matrix = [[0] * 10 for _ in range(NUM_NUMBERS)]
+    for row, number in enumerate(label):
+        label_matrix[row][number] = 1
+    return torch.tensor(label_matrix, dtype=TENSOR_TYPE)
 
 
 def image_to_tensor(image: Image.Image) -> torch.Tensor:
-    return torch.tensor(np.array(image).tolist())
+    return torch.tensor(np.array(image).tolist(), dtype=TENSOR_TYPE)
 
 
 def generate_captcha_image() -> tuple[Image.Image, list[int]]:
