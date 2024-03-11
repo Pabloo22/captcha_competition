@@ -5,6 +5,7 @@ from pathlib import Path
 
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
+import torch
 
 from captcha_competition.paths import FONTS_PATH
 
@@ -20,6 +21,22 @@ DIFF_BETWEEN_BACKGROUND_AND_NUMBER_COLORS = 40
 NUMBER_OF_RANDOM_DOTS = (50, 100)
 NUMBER_OF_RANDOM_LINES = (10, 20)
 NUMBER_OF_RANDOM_CIRCLES = (1, 5)
+
+
+def generate_captcha_tensors() -> tuple[torch.Tensor, torch.Tensor]:
+    image, label = generate_captcha_image()
+    tensor_label = label_to_tensor(label)
+    tensor_image = image_to_tensor(image)
+    return tensor_image, tensor_label
+
+
+def label_to_tensor(label: list[int]) -> torch.Tensor:
+    # TODO: Implement this method
+    return torch.tensor(label)
+
+
+def image_to_tensor(image: Image.Image) -> torch.Tensor:
+    return torch.tensor(np.array(image).tolist())
 
 
 def generate_captcha_image() -> tuple[Image.Image, list[int]]:
