@@ -73,7 +73,6 @@ def resnet_base(input_tensor):
 
 
 def efficientnet_base(input_tensor):
-    from keras.models import Model  # type: ignore
     from keras.layers import (  # type: ignore
         Conv2D,
         BatchNormalization,
