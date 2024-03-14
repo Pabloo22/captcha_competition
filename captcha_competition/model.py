@@ -15,10 +15,10 @@ def create_captcha_model(
     x = Conv2D(num_classes, (3, 3), padding="same", strides=(1, 2))(x)
 
     # Assuming the output is (None, 6, 1, 10), we reshape it to (None, 6, 10)
-    x = Reshape((num_digits, num_classes))(x)
+    # x = Reshape((num_digits, num_classes))(x)
 
-    # Apply softmax activation to convert logits to probabilities
-    x = Activation("softmax")(x)
+    # # Apply softmax activation to convert logits to probabilities
+    # x = Activation("softmax")(x)
     model = Model(inputs=inputs, outputs=x)
 
     # Compile the model
