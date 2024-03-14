@@ -19,6 +19,7 @@ pandas-stubs = "^2.2.0.240218"
 ipykernel = "^6.29.3"
 matplotlib = "^3.8.3"
 types-pillow = "^10.2.0.20240213"
+torchsummary = "^1.5.1"
 
 
 [build-system]
