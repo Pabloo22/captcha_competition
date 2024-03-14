@@ -13,10 +13,8 @@ class EfficientNet(nn.Module):
             out_channels=initial_filters,
             kernel_size=3,
             stride=2,
-            # padding="same",
             bias=False,
         )
-        print(f"{initial_filters=}")
         self.initial_bn = nn.BatchNorm2d(initial_filters)
 
         # Setup MBConv blocks dynamically
@@ -32,7 +30,6 @@ class EfficientNet(nn.Module):
         )
         for i in range(2):
             next_filters = round(current_filters * multiplier)
-            print(f"{next_filters=}")
             self.mb_conv_blocks.add_module(
                 f"mb_conv_block_{i + 2}",
                 MBConvBlock(
@@ -49,7 +46,6 @@ class EfficientNet(nn.Module):
             out_channels=NUM_CLASSES,
             kernel_size=(4, 2),
             stride=(1, 2),
-            # padding="same",
         )
         self.softmax = nn.Softmax(dim=0)
 
