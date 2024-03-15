@@ -8,9 +8,13 @@ TENSOR_TYPE = torch.float32
 NUM_NUMBERS = 6
 
 
-def generate_captcha_tensors() -> tuple[torch.Tensor, torch.Tensor]:
+def generate_captcha_tensors(
+    preprocessing_fc=None,
+) -> tuple[torch.Tensor, torch.Tensor]:
     image, label = generate_captcha_image()
     tensor_label = label_to_tensor(label)
+    if preprocessing_fc is not None:
+        image = preprocessing_fc(image)
     tensor_image = image_to_tensor(image)
     return tensor_image, tensor_label
 
@@ -55,7 +59,11 @@ def label_to_tensor(label: list[int]) -> torch.Tensor:
     return torch.tensor(label_matrix, dtype=TENSOR_TYPE)
 
 
-def image_to_tensor(image: Image.Image) -> torch.Tensor:
-    numpy_image = np.array(image)
-    image_channel_first = np.transpose(numpy_image, (2, 0, 1))
+def image_to_tensor(image: np.ndarray) -> torch.Tensor:
+    image_channel_first = np.transpose(image, (2, 0, 1))
     return torch.tensor(image_channel_first.tolist(), dtype=TENSOR_TYPE)
+
+
+def remove_bg_to_tensor(image: np.ndarray) -> torch.Tensor:
+    image = remove_bg_v1(image)
+    return image_to_tensor(image)

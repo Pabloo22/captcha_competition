@@ -2,6 +2,7 @@ import os
 import random
 import functools
 from pathlib import Path
+import numpy as np
 
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
@@ -28,7 +29,7 @@ NUMBER_OF_RANDOM_LINES = (10, 20)
 NUMBER_OF_RANDOM_CIRCLES = (1, 5)
 
 
-def generate_captcha_image() -> tuple[Image.Image, list[int]]:
+def generate_captcha_image() -> tuple[np.ndarray, list[int]]:
     # Create a blank image with white background
     background_color = tuple(np.random.choice(range(256), size=3))
     image = Image.new("RGB", (WIDTH, HEIGHT), color=background_color)  # type: ignore
@@ -81,7 +82,7 @@ def generate_captcha_image() -> tuple[Image.Image, list[int]]:
             [top_left, bottom_right], outline=numbers_color, fill=numbers_color  # type: ignore
         )
 
-    return image, numbers
+    return np.array(image), numbers
 
 
 def load_random_font(

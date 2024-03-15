@@ -10,6 +10,7 @@ from .preprocessing import (
     image_to_tensor,
     label_to_tensor,
     generate_captcha_tensors,
+    remove_bg_to_tensor,
 )
 from .iterable_dataset import SyntheticCaptchaIterableDataset
 from .dataset import CaptchaDataset
