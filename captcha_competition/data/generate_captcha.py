@@ -7,7 +7,7 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 import torch
 
-from captcha_competition.paths import FONTS_PATH
+from captcha_competition import FONTS_PATH
 
 
 WIDTH = 200
