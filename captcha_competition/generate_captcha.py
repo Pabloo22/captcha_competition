@@ -32,7 +32,7 @@ def generate_captcha_tensors() -> tuple[torch.Tensor, torch.Tensor]:
 
 
 def label_to_tensor(label: list[int]) -> torch.Tensor:
-    label_matrix = [[0] * 10 for _ in range(NUM_NUMBERS)]
+    label_matrix = [[0] * NUM_NUMBERS for _ in range(10)]
     for row, number in enumerate(label):
         label_matrix[row][number] = 1
     return torch.tensor(label_matrix, dtype=TENSOR_TYPE)
