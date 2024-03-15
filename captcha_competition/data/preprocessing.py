@@ -1,9 +1,18 @@
 import numpy as np
 import cv2
 import torch
+from captcha_competition.data.generate_captcha import generate_captcha_image
+from PIL import Image
 
 TENSOR_TYPE = torch.float32
 NUM_NUMBERS = 6
+
+
+def generate_captcha_tensors() -> tuple[torch.Tensor, torch.Tensor]:
+    image, label = generate_captcha_image()
+    tensor_label = label_to_tensor(label)
+    tensor_image = image_to_tensor(image)
+    return tensor_image, tensor_label
 
 
 def most_common_colors(img, n=1):

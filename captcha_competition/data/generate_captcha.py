@@ -8,6 +8,10 @@ from PIL import Image, ImageDraw, ImageFont
 import torch
 
 from captcha_competition import FONTS_PATH
+from captcha_competition.data.preprocessing import (
+    label_to_tensor,
+    image_to_tensor,
+)
 
 
 WIDTH = 200
@@ -22,26 +26,6 @@ DIFF_BETWEEN_BACKGROUND_AND_NUMBER_COLORS = 40
 NUMBER_OF_RANDOM_DOTS = (50, 100)
 NUMBER_OF_RANDOM_LINES = (10, 20)
 NUMBER_OF_RANDOM_CIRCLES = (1, 5)
-
-
-def generate_captcha_tensors() -> tuple[torch.Tensor, torch.Tensor]:
-    image, label = generate_captcha_image()
-    tensor_label = label_to_tensor(label)
-    tensor_image = image_to_tensor(image)
-    return tensor_image, tensor_label
-
-
-def label_to_tensor(label: list[int]) -> torch.Tensor:
-    label_matrix = [[0] * NUM_NUMBERS for _ in range(10)]
-    for row, number in enumerate(label):
-        label_matrix[number][row] = 1
-    return torch.tensor(label_matrix, dtype=TENSOR_TYPE)
-
-
-def image_to_tensor(image: Image.Image) -> torch.Tensor:
-    numpy_image = np.array(image)
-    image_channel_first = np.transpose(numpy_image, (2, 0, 1))
-    return torch.tensor(image_channel_first.tolist(), dtype=TENSOR_TYPE)
 
 
 def generate_captcha_image() -> tuple[Image.Image, list[int]]:
