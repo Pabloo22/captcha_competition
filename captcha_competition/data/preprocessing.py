@@ -1,5 +1,9 @@
 import numpy as np
 import cv2
+import torch
+
+TENSOR_TYPE = torch.float32
+NUM_NUMBERS = 6
 
 
 def most_common_colors(img, n=1):
@@ -33,3 +37,16 @@ def remove_bg_v1(img, grayscale=True):
         new_img = cv2.cvtColor(new_img, cv2.COLOR_BGR2GRAY)
         new_img = cv2.convertScaleAbs(new_img)
     return new_img
+
+
+def label_to_tensor(label: list[int]) -> torch.Tensor:
+    label_matrix = [[0] * NUM_NUMBERS for _ in range(10)]
+    for row, number in enumerate(label):
+        label_matrix[number][row] = 1
+    return torch.tensor(label_matrix, dtype=TENSOR_TYPE)
+
+
+def image_to_tensor(image: Image.Image) -> torch.Tensor:
+    numpy_image = np.array(image)
+    image_channel_first = np.transpose(numpy_image, (2, 0, 1))
+    return torch.tensor(image_channel_first.tolist(), dtype=TENSOR_TYPE)
