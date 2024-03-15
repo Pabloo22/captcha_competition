@@ -2,14 +2,24 @@ import os
 import pandas as pd
 from torchvision.io import read_image
 from torch.utils.data import Dataset
+from captcha_competition import DATA_RAW_PATH
+from generate_captcha import label_to_tensor, image_to_tensor
 
 
-class CustomImageDataset(Dataset):
+class CaptchaDataset(Dataset):
     def __init__(
-        self, annotations_file, img_dir, transform=None, target_transform=None
+        self,
+        data_dir=DATA_RAW_PATH,
+        folder_name="train",
+        transform=image_to_tensor,
+        target_transform=label_to_tensor,
     ):
-        self.img_labels = pd.read_csv(annotations_file)
-        self.img_dir = img_dir
+        self.data_dir = data_dir
+        self.folder_name = folder_name
+        self.img_dir = os.path.join(data_dir, folder_name)
+        self.img_labels = pd.read_csv(
+            os.path.join(data_dir, f"{folder_name}.csv")
+        )
         self.transform = transform
         self.target_transform = target_transform
 
@@ -17,9 +27,12 @@ class CustomImageDataset(Dataset):
         return len(self.img_labels)
 
     def __getitem__(self, idx):
-        img_path = os.path.join(self.img_dir, self.img_labels.iloc[idx, 0])
+        img_path = os.path.join(
+            self.img_dir, str(self.img_labels.iloc[idx, 0]).zfill(5) + ".png"
+        )
         image = read_image(img_path)
         label = self.img_labels.iloc[idx, 1]
+        label = [int(i) for i in str(label)]
         if self.transform:
             image = self.transform(image)
         if self.target_transform:

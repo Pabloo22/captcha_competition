@@ -10,3 +10,4 @@ from .generate_captcha import (
 )
 from .preprocessing import remove_bg_v1
 from .iterable_dataset import SyntheticCaptchaIterableDataset
+from .dataset import CaptchaDataset
