@@ -9,4 +9,4 @@ from .generate_captcha import (
     list_all_fonts,
 )
 from .preprocessing import remove_bg_v1
-from .captcha_dataset import SyntheticCaptchaIterableDataset
+from .iterable_dataset import SyntheticCaptchaIterableDataset
