@@ -1,6 +1,6 @@
 from torch.utils.data import IterableDataset, DataLoader
 
-from captcha_competition import generate_captcha_tensors
+from captcha_competition.data import generate_captcha_tensors
 
 
 # pylint: disable=abstract-method, too-few-public-methods
