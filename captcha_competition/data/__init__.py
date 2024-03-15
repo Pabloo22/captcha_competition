@@ -8,5 +8,5 @@ from .generate_captcha import (
     load_random_font,
     list_all_fonts,
 )
-from preprocessing import remove_bg_v1
+from .preprocessing import remove_bg_v1
 from .captcha_dataset import SyntheticCaptchaIterableDataset
