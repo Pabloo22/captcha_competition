@@ -39,7 +39,9 @@ def label_to_tensor(label: list[int]) -> torch.Tensor:
 
 
 def image_to_tensor(image: Image.Image) -> torch.Tensor:
-    return torch.tensor(np.array(image).tolist(), dtype=TENSOR_TYPE)
+    numpy_image = np.array(image)
+    image_channel_first = np.transpose(numpy_image, (2, 0, 1))
+    return torch.tensor(image_channel_first.tolist(), dtype=TENSOR_TYPE)
 
 
 def generate_captcha_image() -> tuple[Image.Image, list[int]]:
