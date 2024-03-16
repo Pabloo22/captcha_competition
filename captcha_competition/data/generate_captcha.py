@@ -9,18 +9,15 @@ from PIL import Image, ImageDraw, ImageFont
 import torch
 
 from captcha_competition import FONTS_PATH
-from captcha_competition.data.preprocessing import (
-    label_to_tensor,
-    image_to_tensor,
-)
 
 
 WIDTH = 200
 HEIGHT = 80
 NUM_NUMBERS = 6
-Y_CENTER = HEIGHT // 2
 FONT_SIZE = 64
 TENSOR_TYPE = torch.float32
+
+Y_MAXIMUM_OFFSET = 10
 
 DIFF_BETWEEN_BACKGROUND_AND_NUMBER_COLORS = 40
 
@@ -46,7 +43,7 @@ def generate_captcha_image() -> tuple[np.ndarray, list[int]]:
     ):
         numbers_color = tuple(np.random.choice(range(256), size=3))
 
-    y = 0
+    y = random.randint(-Y_MAXIMUM_OFFSET, Y_MAXIMUM_OFFSET)
     # Generate and draw random numbers
     for i in range(NUM_NUMBERS):
         number = random.randint(0, 9)
@@ -107,6 +104,9 @@ def list_all_fonts(fonts_dir=FONTS_PATH) -> list[Path]:
 
 
 if __name__ == "__main__":
+    from captcha_competition.data.visualization import plot_image
+    import matplotlib.pyplot as plt
     captcha_image, numbers_ = generate_captcha_image()
-    captcha_image.show()
+    plot_image(captcha_image)
+    plt.show()
     print(numbers_)
