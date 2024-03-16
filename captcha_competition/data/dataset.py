@@ -3,7 +3,8 @@ import pandas as pd
 from torchvision.io import read_image
 from torch.utils.data import Dataset
 from captcha_competition import DATA_RAW_PATH
-from generate_captcha import label_to_tensor, image_to_tensor
+
+from captcha_competition.data import label_to_tensor, image_to_tensor
 
 
 class CaptchaDataset(Dataset):
