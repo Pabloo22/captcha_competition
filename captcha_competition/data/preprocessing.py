@@ -30,8 +30,8 @@ def get_bg_color(img):
     bottom_color, bottom_count = most_common_colors(bottom)
     if top_count > bottom_count:
         return top_color
-    else:
-        return bottom_color
+
+    return bottom_color
 
 
 def remove_bg_v1(img, grayscale=True):
