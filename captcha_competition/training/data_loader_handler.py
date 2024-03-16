@@ -45,6 +45,9 @@ class DataLoaderHandler:
             num_workers=self.num_workers,
         )
 
+    def __len__(self):
+        return len(self.loader)
+
     def __iter__(self):
         self._iter_loader = iter(self.loader)
         self._current_step = 0
