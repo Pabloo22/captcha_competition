@@ -52,10 +52,7 @@ def remove_bg_v1(img, grayscale=True):
 
 
 def label_to_tensor(label: list[int]) -> torch.Tensor:
-    label_matrix = [[0] * NUM_NUMBERS for _ in range(10)]
-    for row, number in enumerate(label):
-        label_matrix[number][row] = 1
-    return torch.tensor(label_matrix, dtype=TENSOR_TYPE)
+    return torch.tensor(label, dtype=TENSOR_TYPE)
 
 
 def image_to_tensor(image: np.ndarray) -> torch.Tensor:
@@ -66,3 +63,14 @@ def image_to_tensor(image: np.ndarray) -> torch.Tensor:
 def remove_bg_to_tensor(image: np.ndarray) -> torch.Tensor:
     image = remove_bg_v1(image)
     return image_to_tensor(image)
+
+
+if __name__ == "__main__":
+    import matplotlib.pyplot as plt
+    from captcha_competition import 
+
+    image, label = generate_captcha_image()
+    new_image = remove_bg_v1
+
+    # Show original image on top and preprocessed image on bottom
+    fig, ax = plt.subplots(2, 1)
