@@ -1,8 +1,8 @@
-from captcha_competition import (
-    SyntheticCaptchaIterableDataset,
-    create_captcha_model,
-)
 
 
 def main():
-    dataset = SyntheticCaptchaIterableDataset()
+    pass
+
+
+if __name__ == "__main__":
+    main()
