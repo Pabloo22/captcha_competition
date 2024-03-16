@@ -1,6 +1,7 @@
 trainer:
   wandb_project: "captcha_solver_project"
   epochs: 10
+  verbose: true
 
 model:
   model_type: "resnet"  # Can be "resnet" or "efficientnet"
