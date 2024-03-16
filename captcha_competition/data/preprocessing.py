@@ -67,10 +67,14 @@ def remove_bg_to_tensor(image: np.ndarray) -> torch.Tensor:
 
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
-    from captcha_competition import 
+    from captcha_competition.data import plot_image
 
-    image, label = generate_captcha_image()
-    new_image = remove_bg_v1
+    image_, label_ = generate_captcha_image()
+    new_image = remove_bg_v1(image_)
 
     # Show original image on top and preprocessed image on bottom
     fig, ax = plt.subplots(2, 1)
+
+    plot_image(image_, ax=ax[0])
+    plot_image(new_image, ax=ax[1])
+    plt.show()
