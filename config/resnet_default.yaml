@@ -1,0 +1,25 @@
+trainer:
+  wandb_project: "captcha_solver_project"
+  epochs: 10
+
+model:
+  model_type: "resnet"  # Can be "resnet" or "efficientnet"
+  initial_filters: 48
+  multiplier: 2
+
+optimizer:
+  learning_rate: 0.001
+  weight_decay: 0.0001
+
+dataset:
+  dataset_type: "synthetic"  # Can be "real" or "synthetic"
+  folder_name: "train"  # Picks all the images from this folder and the .csv file with the same name.
+  preprocessing_fc_name: "remove_bg_v1"  # Can be "remove_bg_v1" or None for image_to_tensor
+  # data_path: "/path/to/data/raw"  # This will override DATA_RAW_PATH if specified
+
+dataloader_params:
+  batch_size: 32
+  shuffle: true
+  num_workers: 4
+  steps_per_epoch: 100  # If dataset_type is "synthetic". Else, it should be None
+
