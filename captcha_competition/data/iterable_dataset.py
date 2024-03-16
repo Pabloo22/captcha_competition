@@ -1,3 +1,6 @@
+from typing import Callable, Generator
+
+import torch
 from torch.utils.data import IterableDataset, DataLoader
 import numpy as np
 
@@ -10,19 +13,25 @@ from captcha_competition.data import (
 
 # pylint: disable=abstract-method, too-few-public-methods
 class SyntheticCaptchaIterableDataset(IterableDataset):
-    def __init__(self, preprocessing_fc=None, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+
+    def __init__(
+        self,
+        preprocessing_fc: Callable[
+            [np.ndarray], torch.Tensor
+        ] = image_to_tensor,
+    ):
+        super().__init__()
         self.preprocessing_fc = preprocessing_fc
 
-    def __iter__(self):
+    def __iter__(
+        self,
+    ) -> Generator[tuple[torch.Tensor, torch.Tensor], None, None]:
         # This method generates CAPTCHA images and labels indefinitely
         while True:
             captcha_image, label = generate_captcha_image()
-            if self.preprocessing_fc is not None:
-                captcha_image = self.preprocessing_fc(captcha_image)
-            captcha_image = image_to_tensor(captcha_image)
-            label = label_to_tensor(label)
-            yield captcha_image, label
+            captcha_image_tensor = self.preprocessing_fc(captcha_image)
+            label_tensor = label_to_tensor(label)
+            yield captcha_image_tensor, label_tensor
 
 
 if __name__ == "__main__":
