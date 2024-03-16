@@ -47,7 +47,7 @@ class EfficientNet(nn.Module):
             kernel_size=(4, 2),
             stride=(1, 2),
         )
-        self.softmax = nn.Softmax(dim=0)
+        self.softmax = nn.LogSoftmax(dim=0)
 
     def forward(self, x):
         x = F.relu(self.initial_bn(self.initial_conv(x)))
