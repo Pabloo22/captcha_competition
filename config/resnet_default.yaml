@@ -18,9 +18,8 @@ dataset:
   preprocessing_fc_name: "remove_bg_v1"  # Can be "remove_bg_v1" or None for image_to_tensor
   # data_path: "/path/to/data/raw"  # This will override DATA_RAW_PATH if specified
 
-dataloader_params:
+dataloader:
   batch_size: 32
   shuffle: true
   num_workers: 4
   steps_per_epoch: 100  # If dataset_type is "synthetic". Else, it should be None
-
