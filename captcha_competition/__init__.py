@@ -9,3 +9,4 @@ from .paths import (
     FONTS_PATH,
 )
 from .model import create_captcha_model, efficientnet_base, resnet_base
+from .load_config import load_config, ConfigKeys
