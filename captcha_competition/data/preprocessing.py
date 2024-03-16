@@ -2,7 +2,6 @@ import numpy as np
 import cv2
 import torch
 from captcha_competition.data.generate_captcha import generate_captcha_image
-from PIL import Image
 
 TENSOR_TYPE = torch.float32
 NUM_NUMBERS = 6
