@@ -46,3 +46,19 @@ class CustomAccuracyMetric:
         """
         self.correct_predictions = 0
         self.total_predictions = 0
+
+
+def custom_accuracy(outputs: torch.Tensor, targets: torch.Tensor) -> float:
+    """
+    Compute the accuracy metric.
+
+    Parameters:
+    - outputs: torch.Tensor of shape (batch_size, 10, 6) - model predictions.
+    - targets: torch.Tensor of shape (batch_size, 6) - true labels.
+
+    Returns:
+    - The accuracy as a float.
+    """
+    accuracy_metric = CustomAccuracyMetric()
+    accuracy_metric.update(outputs, targets)
+    return accuracy_metric.compute()
