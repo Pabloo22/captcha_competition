@@ -23,6 +23,8 @@ def get_configuration_filename() -> str:
 def main():
     config_filename = get_configuration_filename()
     config = load_config(config_filename)
+
+    wandb.init(project="captcha_competition", config=config)
     trainer = trainer_factory(
         model_params=config[ConfigKeys.MODEL],
         optimizer_params=config[ConfigKeys.OPTIMIZER],
@@ -31,6 +33,7 @@ def main():
         dataloader_params=config[ConfigKeys.DATALOADER],
         trainer_params=config[ConfigKeys.TRAINER],
     )
+    trainer.train()
 
 
 if __name__ == "__main__":
