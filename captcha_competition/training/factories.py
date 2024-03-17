@@ -19,9 +19,9 @@ from captcha_competition import DATA_RAW_PATH
 def trainer_factory(
     model_params: dict,
     optimizer_params: dict,
-    dataloader_params: dict,
     dataset_params: dict,
-    wandb_project: Optional[str] = None,
+    dataloader_params: dict,
+    trainer_params: dict,
 ):
     model = model_factory(**model_params)
     optimizer = optimizer_factory(model, **optimizer_params)
@@ -31,7 +31,7 @@ def trainer_factory(
         model=model,
         optimizer=optimizer,
         data_loader_handler=dataloader,
-        wandb_project=wandb_project,
+        **trainer_params,
     )
 
 
