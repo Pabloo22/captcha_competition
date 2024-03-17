@@ -1,5 +1,4 @@
 from typing import Optional, Callable
-
 from pathlib import Path
 
 import torch
@@ -9,8 +8,9 @@ from captcha_competition.pytorch_model import ResNet, EfficientNet
 from captcha_competition.data import (
     CaptchaDataset,
     SyntheticCaptchaIterableDataset,
-    remove_bg_v1,
-    image_to_tensor,
+)
+from captcha_competition.data.preprocessing_pipelines import (
+    create_preprocessing_pipeline,
 )
 from captcha_competition.training import DataLoaderHandler, Trainer
 from captcha_competition import DATA_RAW_PATH
@@ -19,6 +19,7 @@ from captcha_competition import DATA_RAW_PATH
 def trainer_factory(
     model_params: dict,
     optimizer_params: dict,
+    preprocessing_params: dict,
     train_dataset_params: dict,
     val_dataset_params: dict,
     dataloader_params: dict,
@@ -26,9 +27,17 @@ def trainer_factory(
 ):
     model = model_factory(**model_params)
     optimizer = optimizer_factory(model, **optimizer_params)
-    dataset = dataset_factory(**train_dataset_params)
+
+    preprocessing_fc = preprocessing_fc_factory(
+        model_type=model_params["model_type"], **preprocessing_params
+    )
+    dataset = dataset_factory(
+        preprocessing_fc=preprocessing_fc, **train_dataset_params
+    )
     dataloader = DataLoaderHandler(dataset, **dataloader_params)
-    test_dataset = dataset_factory(**val_dataset_params)
+    test_dataset = dataset_factory(
+        preprocessing_fc=preprocessing_fc, **val_dataset_params
+    )
     val_dataloader = DataLoaderHandler(test_dataset, **dataloader_params)
     return Trainer(
         model=model,
@@ -67,16 +76,15 @@ def optimizer_factory(
 
 def dataset_factory(
     dataset_type: str,
+    preprocessing_fc: Callable[[np.ndarray], np.ndarray],
     folder_name: str = "train",
-    preprocessing_fc_name: Optional[str] = None,
     data_path: Path = DATA_RAW_PATH,
 ):
-    preprocessing_fc = preprocessing_fc_factory(preprocessing_fc_name)
     if dataset_type == "real":
         return CaptchaDataset(
-            data_dir=data_path,
+            raw_data_dir=data_path,
             folder_name=folder_name,
-            transform=preprocessing_fc,
+            preprocessing_fc=preprocessing_fc,
         )
     if dataset_type == "synthetic":
         return SyntheticCaptchaIterableDataset(
@@ -86,12 +94,24 @@ def dataset_factory(
 
 
 def preprocessing_fc_factory(
-    preprocessing_fc: Optional[str],
-) -> Callable[[np.ndarray], torch.Tensor]:
-    if preprocessing_fc == "remove_bg_v1":
-        return remove_bg_v1
-    if preprocessing_fc is None:
-        return image_to_tensor
-    raise ValueError(
-        f"Preprocessing function {preprocessing_fc} not supported"
-    )
+    model_type: str = "",
+    use_full_preprocessing: bool = False,
+    preprocessing_steps: Optional[list[str]] = None,
+) -> Callable[[np.ndarray], np.ndarray]:
+
+    if preprocessing_steps is not None:
+        return create_preprocessing_pipeline(preprocessing_steps)
+
+    if use_full_preprocessing:
+        preprocessing_steps = ["remove_background", "to_grayscale", "closing"]
+    else:
+        preprocessing_steps = []
+
+    if model_type == "resnet":
+        preprocessing_steps.append("resize_resnet")
+    elif model_type == "efficientnet":
+        preprocessing_steps.append("resize_efficientnet")
+    else:
+        raise ValueError(f"Model type {model_type} not supported")
+
+    return create_preprocessing_pipeline(preprocessing_steps)
