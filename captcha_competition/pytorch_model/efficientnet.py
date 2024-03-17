@@ -5,11 +5,17 @@ import torch.nn.functional as F
 NUM_CLASSES = 10
 INPUT_SHAPE = (3, 80, 210)
 
+
 class EfficientNet(nn.Module):
-    def __init__(self, initial_filters: int = 32, multiplier: float = 1.5):
+    def __init__(
+        self,
+        initial_filters: int = 32,
+        multiplier: float = 1.5,
+        in_channels: int = 3,
+    ):
         super().__init__()
         self.initial_conv = nn.Conv2d(
-            in_channels=3,
+            in_channels=in_channels,
             out_channels=initial_filters,
             kernel_size=3,
             stride=2,
