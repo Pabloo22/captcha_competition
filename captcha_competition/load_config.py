@@ -11,7 +11,8 @@ class ConfigKeys(str, Enum):
     TRAINER = "trainer"
     MODEL = "model"
     OPTIMIZER = "optimizer"
-    DATASET = "dataset"
+    TRAIN_DATASET = "train_dataset"
+    VAL_DATASET = "val_dataset"
     DATALOADER = "dataloader"
 
 
@@ -28,5 +29,5 @@ if __name__ == "__main__":
     print(config[ConfigKeys.MODEL])
     print(config[ConfigKeys.MODEL]["model_type"])
 
-    print(config[ConfigKeys.DATASET])
-    print(config[ConfigKeys.DATASET]["dataset_type"])
+    print(config[ConfigKeys.TRAIN_DATASET])
+    print(config[ConfigKeys.TRAIN_DATASET]["dataset_type"])
