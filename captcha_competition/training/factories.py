@@ -19,19 +19,33 @@ from captcha_competition import DATA_RAW_PATH
 def trainer_factory(
     model_params: dict,
     optimizer_params: dict,
-    dataset_params: dict,
+    train_dataset_params: dict,
+    val_dataset_params: dict,
     dataloader_params: dict,
     trainer_params: dict,
 ):
     model = model_factory(**model_params)
     optimizer = optimizer_factory(model, **optimizer_params)
-    dataset = dataset_factory(**dataset_params)
+    dataset = dataset_factory(**train_dataset_params)
     dataloader = DataLoaderHandler(dataset, **dataloader_params)
+    test_dataset = dataset_factory(**val_dataset_params)
+    val_dataloader = DataLoaderHandler(test_dataset, **dataloader_params)
     return Trainer(
         model=model,
         optimizer=optimizer,
-        data_loader_handler=dataloader,
+        train_dataloader_handler=dataloader,
+        val_dataloader_handler=val_dataloader,
+        name=get_model_name(model_params, train_dataset_params),
         **trainer_params,
+    )
+
+
+def get_model_name(model_params: dict, dataset_params: dict) -> str:
+    return (
+        f"{model_params['model_type']}_"
+        f"{model_params['initial_filters']}_"
+        f"{model_params['multiplier']}_"
+        f"{dataset_params['dataset_type']}"
     )
 
 
