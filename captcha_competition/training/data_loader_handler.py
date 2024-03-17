@@ -30,7 +30,8 @@ class DataLoaderHandler:
             raise ValueError(
                 "For IterableDataset, `steps_per_epoch` must be specified"
             )
-
+        if not is_iterable and self.steps_per_epoch is not None:
+            self.steps_per_epoch = None
         # Create DataLoader with or without shuffling based on the dataset type
         return DataLoader(
             self.dataset,
