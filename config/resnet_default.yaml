@@ -22,15 +22,16 @@ preprocessing:
   #   - "resize_resnet"
 
 train_dataset:
-  dataset_type: "synthetic"  # Can be "real" or "synthetic"
+  dataset_type: "real"  # Can be "real" or "synthetic"
+  folder_name: "train"  # Picks all the images from this folder and the .csv file with the same name.
 
 val_dataset:
   dataset_type: "real"  # Can be "real" or "synthetic"
-  folder_name: "train"  # Picks all the images from this folder and the .csv file with the same name.
+  folder_name: "validation"
   # data_path: "/path/to/data/raw"  # This will override DATA_RAW_PATH if specified
 
 dataloader:
   batch_size: 32
   shuffle: true
   num_workers: 4
-  steps_per_epoch: 100  # If any of the datasets' types is "synthetic". Else, it should be None
+  steps_per_epoch: 100  # If any of the datasets' types is "synthetic".
