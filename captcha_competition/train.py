@@ -13,9 +13,9 @@ def get_configuration_filename() -> str:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "config_filename",
-        type=str,
-        help="The name of the configuration file to be loaded",
+        nargs="?",
         default=DEFAULT_CONFIG_FILENAME,
+        help="Name of the configuration file",
     )
     return parser.parse_args().config_filename
 
