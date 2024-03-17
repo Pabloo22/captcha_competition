@@ -5,26 +5,32 @@ trainer:
 
 model:
   model_type: "resnet"  # Can be "resnet" or "efficientnet"
-  initial_filters: 48
+  initial_filters: 64
   multiplier: 2
 
 optimizer:
   learning_rate: 0.001
   weight_decay: 0.0001
 
+preprocessing:
+  use_full_preprocessing: true
+  # Equivalent to:
+  # preprocessing_steps:
+  #   - "remove_background"
+  #   - "to_grayscale"
+  #   - "closing"
+  #   - "resize_resnet"
+
 train_dataset:
   dataset_type: "synthetic"  # Can be "real" or "synthetic"
-  preprocessing_fc_name: "remove_bg_v1"  # Can be "remove_bg_v1" or None for image_to_tensor
-  # data_path: "/path/to/data/raw"  # This will override DATA_RAW_PATH if specified
 
 val_dataset:
   dataset_type: "real"  # Can be "real" or "synthetic"
   folder_name: "train"  # Picks all the images from this folder and the .csv file with the same name.
-  preprocessing_fc_name: "remove_bg_v1"  # Can be "remove_bg_v1" or None for image_to_tensor
   # data_path: "/path/to/data/raw"  # This will override DATA_RAW_PATH if specified
 
 dataloader:
   batch_size: 32
   shuffle: true
   num_workers: 4
-  steps_per_epoch: 100  # If dataset_type is "synthetic". Else, it should be None
+  steps_per_epoch: 100  # If any of the datasets' types is "synthetic". Else, it should be None
