@@ -11,6 +11,8 @@ from captcha_competition.data.preprocessing import (
     label_to_tensor,
     generate_captcha_tensors,
     remove_bg_to_tensor,
+    cleaned_image,
+    preprocessing_image,
 )
 from captcha_competition.data.iterable_dataset import (
     SyntheticCaptchaIterableDataset,
