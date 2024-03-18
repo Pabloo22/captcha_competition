@@ -30,14 +30,14 @@ class Trainer:
         name: Optional[str] = None,
         num_samples: int = 10,
     ):
+        self.model = model.to(DEVICE)
         if verbose:
             from torchsummary import summary  # type: ignore
 
             print(f"Using device: {DEVICE}")
             model_type = model.__class__.__name__.lower()
-            summary(model, input_size=INPUT_SHAPES[model_type])
+            summary(self.model, input_size=INPUT_SHAPES[model_type])
 
-        self.model = model.to(DEVICE)
         self.optimizer = optimizer
         self.use_wandb = wandb.run is not None
         self.train_dataloader_handler = train_dataloader_handler
@@ -58,7 +58,6 @@ class Trainer:
         self.num_samples = num_samples
 
         if self.use_wandb:
-            # Watch the model
             wandb.watch(self.model, criterion=self.criterion, log="all")
 
     def train(self) -> None:
@@ -69,8 +68,6 @@ class Trainer:
             for batch_idx, (images, labels) in enumerate(
                 self.train_dataloader_handler, start=0
             ):
-                images, labels = images.to(DEVICE), labels.to(DEVICE)
-
                 loss = self.training_step(images, labels)
                 losses[batch_idx] = loss
                 if self.verbose:
@@ -136,7 +133,6 @@ class Trainer:
 
         with torch.no_grad():
             for images, labels in self.val_dataloader_handler:
-                images, labels = images.to(DEVICE), labels.to(DEVICE)
                 outputs = self.model(images)
                 loss = self.criterion(outputs, labels)
                 losses.append(loss.item())
@@ -151,20 +147,11 @@ class Trainer:
                         outputs,
                         labels,
                     )
-
-        # Log incorrect samples to wandb
+        log_images = []
         if incorrect_images:
-            # Log incorrect samples to wandb
-            log_images = []
-            for img, pred, label in zip(
+            log_images = self._crate_log_images(
                 incorrect_images, incorrect_preds, incorrect_labels
-            ):
-                img = img.permute(1, 2, 0)  # Convert CHW to HWC
-                img = img.numpy()  # Convert tensor to numpy array
-                img = (img * 255).astype(np.uint8)
-                # Now img is ready for conversion to PIL Image within wandb.Image
-                caption = f"Pred: {pred.tolist()}, Label: {label.tolist()}"
-                log_images.append(wandb.Image(img, caption=caption))
+            )
 
         return (
             sum(losses) / len(losses),
@@ -191,3 +178,17 @@ class Trainer:
                 incorrect_images.append(images[idx].cpu())
                 incorrect_preds.append(preds[idx].cpu())
                 incorrect_labels.append(labels[idx].cpu())
+
+    def _crate_log_images(
+        self, incorrect_images, incorrect_preds, incorrect_labels
+    ) -> list[wandb.Image]:
+        log_images = []
+        for img, pred, label in zip(
+            incorrect_images, incorrect_preds, incorrect_labels
+        ):
+            img = img.permute(1, 2, 0)
+            img = img.numpy()
+            img = (img * 255).astype(np.uint8)
+            caption = f"Pred: {pred.tolist()}, Label: {label.tolist()}"
+            log_images.append(wandb.Image(img, caption=caption))
+        return log_images
