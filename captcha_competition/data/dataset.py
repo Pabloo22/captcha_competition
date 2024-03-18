@@ -19,6 +19,7 @@ class CaptchaDataset(Dataset):
         preprocessing_fc: Callable[[np.ndarray], np.ndarray] = lambda x: x,
         raw_data_dir: Path = DATA_RAW_PATH,
         processed_data_dir: Path = DATA_PROCESSED_PATH,
+        remove_previously_processed: bool = False,
     ):
         super().__init__()
         self.raw_data_dir = raw_data_dir
@@ -28,6 +29,10 @@ class CaptchaDataset(Dataset):
         self.processed_img_dir = os.path.join(processed_data_dir, folder_name)
 
         os.makedirs(self.processed_img_dir, exist_ok=True)
+
+        if remove_previously_processed:
+            for img_name in os.listdir(self.processed_img_dir):
+                os.remove(os.path.join(self.processed_img_dir, img_name))
 
         self.img_labels = pd.read_csv(
             os.path.join(raw_data_dir, f"{folder_name}.csv")
@@ -56,3 +61,7 @@ class CaptchaDataset(Dataset):
 
         label_tensor = label_to_tensor(label)
         return image_tensor, label_tensor
+
+
+if __name__ == "__main__":
+    pass

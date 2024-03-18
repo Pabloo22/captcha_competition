@@ -86,12 +86,14 @@ def dataset_factory(
     preprocessing_fc: Callable[[np.ndarray], np.ndarray],
     folder_name: str = "train",
     data_path: Path = DATA_RAW_PATH,
+    remove_previously_processed: bool = False,
 ):
     if dataset_type == "real":
         return CaptchaDataset(
             raw_data_dir=data_path,
             folder_name=folder_name,
             preprocessing_fc=preprocessing_fc,
+            remove_previously_processed=remove_previously_processed,
         )
     if dataset_type == "synthetic":
         return SyntheticCaptchaIterableDataset(
