@@ -11,6 +11,8 @@ from captcha_competition.training import (
 )
 
 
+INPUT_SHAPES = {"resnet": (3, 64, 192), "efficientnet": (3, 80, 210)}
+
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
@@ -27,7 +29,12 @@ class Trainer:
         name: Optional[str] = None,
     ):
         if verbose:
+            from torchsummary import summary  # type: ignore
+
             print(f"Using device: {DEVICE}")
+            model_type = model.__class__.__name__.lower()
+            summary(model, input_size=INPUT_SHAPES[model_type])
+
         self.model = model.to(DEVICE)
         self.optimizer = optimizer
         self.use_wandb = wandb.run is not None
@@ -64,6 +71,12 @@ class Trainer:
             train_loss = sum(losses) / len(losses)
             train_accuracy = self.accuracy_metric.compute()
             eval_loss, eval_accuracy = self.evaluate()
+            if self.verbose:
+                print(
+                    f"Epoch {epoch + 1}, Train Loss: {train_loss}, "
+                    f"Train Accuracy: {train_accuracy}, "
+                    f"Eval Loss: {eval_loss}, Eval Accuracy: {eval_accuracy}"
+                )
             if self.use_wandb:
                 wandb.log(
                     {
