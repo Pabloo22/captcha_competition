@@ -56,7 +56,7 @@ class ResNet(nn.Module):
             stride=(1, 1),
             # padding="same",
         )
-        self.softmax = nn.Softmax(dim=0)
+        self.softmax = nn.LogSoftmax(dim=0)
 
     def forward(self, x):
         x = F.relu(self.bn1(self.conv1(x)))
