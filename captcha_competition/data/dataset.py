@@ -2,6 +2,7 @@ from typing import Callable
 from pathlib import Path
 import os
 
+import torch
 import numpy as np
 import pandas as pd
 from torchvision.io import read_image  # type: ignore
@@ -13,6 +14,9 @@ from captcha_competition.data.preprocessing_pipelines import (
     label_to_tensor,
     image_to_tensor,
 )
+
+
+DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 class CaptchaDataset(Dataset):
@@ -60,6 +64,7 @@ class CaptchaDataset(Dataset):
         else:
             image_tensor = read_image(processed_img_path)
             image_tensor = image_tensor.float() / 255.0
+            image_tensor = image_tensor.to(DEVICE)
 
         label = self.img_labels.iloc[idx, 1]
         label = [int(i) for i in str(label).zfill(6)]
