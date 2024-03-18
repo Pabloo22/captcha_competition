@@ -9,7 +9,10 @@ from torch.utils.data import Dataset
 import imageio
 
 from captcha_competition import DATA_RAW_PATH, DATA_PROCESSED_PATH
-from captcha_competition.data import label_to_tensor, image_to_tensor
+from captcha_competition.data.preprocessing_pipelines import (
+    label_to_tensor,
+    image_to_tensor,
+)
 
 
 class CaptchaDataset(Dataset):
@@ -51,13 +54,15 @@ class CaptchaDataset(Dataset):
         if not os.path.exists(processed_img_path):
             raw_image = imageio.imread(raw_img_path)
             processed_image = self.preprocessing_fc(raw_image)
-            imageio.imwrite(processed_img_path, processed_image)
+            save_img = (processed_image * 255).astype(np.uint8)
+            imageio.imwrite(processed_img_path, save_img)
             image_tensor = image_to_tensor(processed_image)
         else:
             image_tensor = read_image(processed_img_path)
+            image_tensor = image_tensor.float() / 255.0
 
         label = self.img_labels.iloc[idx, 1]
-        label = [int(i) for i in str(label)]
+        label = [int(i) for i in str(label).zfill(6)]
 
         label_tensor = label_to_tensor(label)
         return image_tensor, label_tensor
