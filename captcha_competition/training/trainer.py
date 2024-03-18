@@ -27,6 +27,7 @@ class Trainer:
         epochs: int,
         verbose: bool = True,
         name: Optional[str] = None,
+        num_samples: int = 10,
     ):
         if verbose:
             from torchsummary import summary  # type: ignore
@@ -52,6 +53,8 @@ class Trainer:
         self.best_eval_accuracy = 0.0
 
         self.checkpoint_path = MODELS_PATH / f"{self.name}.pt"
+
+        self.num_samples = num_samples
 
         if self.use_wandb:
             # Watch the model
@@ -124,6 +127,11 @@ class Trainer:
         self.model.eval()
         losses = []
         self.accuracy_metric.reset()
+
+        incorrect_images = []
+        incorrect_preds = []
+        incorrect_labels = []
+
         with torch.no_grad():
             for images, labels in self.val_dataloader_handler:
                 images, labels = images.to(DEVICE), labels.to(DEVICE)
@@ -131,4 +139,47 @@ class Trainer:
                 loss = self.criterion(outputs, labels)
                 losses.append(loss.item())
                 self.accuracy_metric.update(outputs, labels)
+
+                if len(incorrect_images) < self.num_samples:
+                    self._update_incorrect_images(
+                        incorrect_images,
+                        incorrect_preds,
+                        incorrect_labels,
+                        images,
+                        outputs,
+                        labels,
+                    )
+
+        # Log incorrect samples to wandb
+        if self.use_wandb and incorrect_images:
+            # Convert tensor images to PIL images or a similar format that wandb can log
+            log_images = [
+                wandb.Image(
+                    img.permute(1, 2, 0), caption=f"Pred: {pred}, Label: {label}"
+                )
+                for img, pred, label in zip(
+                    incorrect_images, incorrect_preds, incorrect_labels
+                )
+            ]
+            wandb.log({"incorrect_samples": log_images})
+
         return sum(losses) / len(losses), self.accuracy_metric.compute()
+
+    def _update_incorrect_images(
+        self,
+        incorrect_images: list[torch.Tensor],
+        incorrect_preds: list[torch.Tensor],
+        incorrect_labels: list[torch.Tensor],
+        images: torch.Tensor,
+        outputs: torch.Tensor,
+        labels: torch.Tensor,
+    ):
+        preds = outputs.argmax(dim=1)
+        incorrect_indices = (preds != labels).nonzero(as_tuple=True)[0]
+        if incorrect_indices:
+            for idx in incorrect_indices:
+                if len(incorrect_images) >= self.num_samples:
+                    break
+                incorrect_images.append(images[idx].cpu())
+                incorrect_preds.append(preds[idx].cpu())
+                incorrect_labels.append(labels[idx].cpu())
