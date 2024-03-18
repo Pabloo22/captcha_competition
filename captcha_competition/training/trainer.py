@@ -2,6 +2,7 @@ from typing import Optional
 
 import torch
 import wandb
+import numpy as np
 
 from captcha_competition import MODELS_PATH
 from captcha_competition.training import (
@@ -79,7 +80,7 @@ class Trainer:
             # Log to wandb every epoch
             train_loss = sum(losses) / len(losses)
             train_accuracy = self.accuracy_metric.compute()
-            eval_loss, eval_accuracy = self.evaluate()
+            eval_loss, eval_accuracy, log_images = self.evaluate()
             if self.verbose:
                 print(
                     f"Epoch {epoch + 1}, Train Loss: {train_loss}, "
@@ -93,6 +94,7 @@ class Trainer:
                         "train_accuracy": train_accuracy,
                         "eval_loss": eval_loss,
                         "eval_accuracy": eval_accuracy,
+                        "incorrect_images": log_images,
                     }
                 )
             if eval_accuracy > self.best_eval_accuracy:
@@ -140,7 +142,7 @@ class Trainer:
                 losses.append(loss.item())
                 self.accuracy_metric.update(outputs, labels)
 
-                if len(incorrect_images) < self.num_samples:
+                if len(incorrect_images) < self.num_samples and self.use_wandb:
                     self._update_incorrect_images(
                         incorrect_images,
                         incorrect_preds,
@@ -151,19 +153,24 @@ class Trainer:
                     )
 
         # Log incorrect samples to wandb
-        if self.use_wandb and incorrect_images:
-            # Convert tensor images to PIL images or a similar format that wandb can log
-            log_images = [
-                wandb.Image(
-                    img.permute(1, 2, 0), caption=f"Pred: {pred}, Label: {label}"
-                )
-                for img, pred, label in zip(
-                    incorrect_images, incorrect_preds, incorrect_labels
-                )
-            ]
-            wandb.log({"incorrect_samples": log_images})
+        if incorrect_images:
+            # Log incorrect samples to wandb
+            log_images = []
+            for img, pred, label in zip(
+                incorrect_images, incorrect_preds, incorrect_labels
+            ):
+                img = img.permute(1, 2, 0)  # Convert CHW to HWC
+                img = img.numpy()  # Convert tensor to numpy array
+                img = (img * 255).astype(np.uint8)
+                # Now img is ready for conversion to PIL Image within wandb.Image
+                caption = f"Pred: {pred.tolist()}, Label: {label.tolist()}"
+                log_images.append(wandb.Image(img, caption=caption))
 
-        return sum(losses) / len(losses), self.accuracy_metric.compute()
+        return (
+            sum(losses) / len(losses),
+            self.accuracy_metric.compute(),
+            log_images,
+        )
 
     def _update_incorrect_images(
         self,
@@ -176,7 +183,8 @@ class Trainer:
     ):
         preds = outputs.argmax(dim=1)
         incorrect_indices = (preds != labels).nonzero(as_tuple=True)[0]
-        if incorrect_indices:
+        print(f"{incorrect_indices.shape =}")
+        if len(incorrect_indices) > 0:
             for idx in incorrect_indices:
                 if len(incorrect_images) >= self.num_samples:
                     break
