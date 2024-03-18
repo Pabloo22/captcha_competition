@@ -50,7 +50,7 @@ class Trainer:
             losses = [0.0] * len(self.train_dataloader_handler)
             self.accuracy_metric.reset()
             for batch_idx, (images, labels) in enumerate(
-                self.train_dataloader_handler, start=1
+                self.train_dataloader_handler, start=0
             ):
                 images, labels = images.to(DEVICE), labels.to(DEVICE)
 
@@ -58,7 +58,7 @@ class Trainer:
                 losses[batch_idx] = loss
                 if self.verbose:
                     print(
-                        f"Epoch {epoch + 1}, Batch {batch_idx}, Loss: {loss}"
+                        f"Epoch {epoch + 1}, Batch {batch_idx + 1}, Loss: {loss}"
                     )
             # Log to wandb every epoch
             train_loss = sum(losses) / len(losses)
