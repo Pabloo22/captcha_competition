@@ -1,14 +1,14 @@
 trainer:
-  epochs: 10
+  epochs: 10000
   verbose: true
 
 model:
   model_type: "resnet"  # Can be "resnet" or "efficientnet"
-  initial_filters: 48
+  initial_filters: 16
   multiplier: 2
 
 optimizer:
-  learning_rate: 0.001
+  learning_rate: 0.0005
   weight_decay: 0.0001
 
 preprocessing:
@@ -25,17 +25,16 @@ preprocessing:
 
 train_dataset:
   remove_previously_processed: true
-  dataset_type: "real"  # Can be "real" or "synthetic"
-  folder_name: "train"  # Picks all the images from this folder and the .csv file with the same name.
+  dataset_type: "synthetic"  # Can be "real" or "synthetic"
 
 val_dataset:
   remove_previously_processed: true
   dataset_type: "real"  # Can be "real" or "synthetic"
-  folder_name: "validation"
+  folder_name: "validation"  # Picks all the images from this folder and the .csv file with the same name.
   # data_path: "/path/to/data/raw"  # This will override DATA_RAW_PATH if specified
 
 dataloader:
-  batch_size: 32
+  batch_size: 64
   shuffle: true
-  num_workers: 4
-  steps_per_epoch: 100  # If any of the datasets' types is "synthetic".
+  num_workers: 6
+  steps_per_epoch: 50  # If any of the datasets' types is "synthetic".

@@ -1,5 +1,5 @@
 trainer:
-  epochs: 10
+  epochs: 1000
   verbose: true
 
 model:
@@ -12,7 +12,7 @@ optimizer:
   weight_decay: 0.0001
 
 preprocessing:
-  use_full_preprocessing: false
+  use_full_preprocessing: true
   # If true, equivalent to:
   # preprocessing_steps:
   #   - "remove_background"
