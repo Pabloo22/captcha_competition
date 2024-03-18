@@ -11,6 +11,9 @@ from captcha_competition.training import (
 )
 
 
+DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+
 class Trainer:
 
     def __init__(
@@ -23,7 +26,9 @@ class Trainer:
         verbose: bool = True,
         name: Optional[str] = None,
     ):
-        self.model = model
+        if verbose:
+            print(f"Using device: {DEVICE}")
+        self.model = model.to(DEVICE)
         self.optimizer = optimizer
         self.use_wandb = wandb.run is not None
         self.train_dataloader_handler = train_dataloader_handler
@@ -47,9 +52,11 @@ class Trainer:
             for batch_idx, (images, labels) in enumerate(
                 self.train_dataloader_handler, start=1
             ):
+                images, labels = images.to(DEVICE), labels.to(DEVICE)
+
                 loss = self.training_step(images, labels)
                 losses[batch_idx] = loss
-                if batch_idx % 100 == 0 and self.verbose:
+                if self.verbose:
                     print(
                         f"Epoch {epoch + 1}, Batch {batch_idx}, Loss: {loss}"
                     )
@@ -100,7 +107,8 @@ class Trainer:
         losses = []
         self.accuracy_metric.reset()
         with torch.no_grad():
-            for images, labels in self.val_dataset:
+            for images, labels in self.val_dataloader_handler:
+                images, labels = images.to(DEVICE), labels.to(DEVICE)
                 outputs = self.model(images)
                 loss_fn = CustomCategoricalCrossEntropyLoss()
                 loss = loss_fn(outputs, labels)
