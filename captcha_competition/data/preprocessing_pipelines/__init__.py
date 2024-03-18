@@ -1,6 +1,7 @@
 from captcha_competition.data.preprocessing_pipelines.steps import (
     remove_background,
     to_grayscale,
+    min_max_normalize,
     apply_morphological_closing,
     resize,
     image_to_tensor,
