@@ -112,7 +112,11 @@ def preprocessing_fc_factory(
         return create_preprocessing_pipeline(preprocessing_steps)
 
     if use_full_preprocessing:
-        preprocessing_steps = ["remove_background", "to_grayscale", "closing"]
+        preprocessing_steps = [
+            "remove_background",
+            "to_grayscale",
+            "closing",
+        ]
     else:
         preprocessing_steps = []
 
@@ -123,4 +127,34 @@ def preprocessing_fc_factory(
     else:
         raise ValueError(f"Model type {model_type} not supported")
 
+    preprocessing_steps.append("min_max_normalize")
     return create_preprocessing_pipeline(preprocessing_steps)
+
+
+if __name__ == "__main__":
+    # Import Dataloader from pytorch
+    from torch.utils.data import DataLoader
+
+    # Dataset params:
+    train_dataset_params = {
+        "dataset_type": "real",
+        "folder_name": "train",
+        "remove_previously_processed": True,
+    }
+    preprocessing_fc = preprocessing_fc_factory(
+        model_type="resnet", use_full_preprocessing=True
+    )
+    train_dataset = dataset_factory(
+        preprocessing_fc=preprocessing_fc, **train_dataset_params  # type: ignore
+    )
+
+    # dataloader = DataLoaderHandler(train_dataset, batch_size=64, num_workers=4)
+    dataloader = DataLoader(
+        train_dataset, batch_size=64, num_workers=0, shuffle=True
+    )
+    for batch_idx, (images, labels) in enumerate(dataloader, start=1):
+        print(f"Batch {batch_idx}:")
+        print(images.shape, labels.shape)
+
+        if batch_idx >= 10:
+            break
