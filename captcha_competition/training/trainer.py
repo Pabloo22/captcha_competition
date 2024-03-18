@@ -128,8 +128,7 @@ class Trainer:
             for images, labels in self.val_dataloader_handler:
                 images, labels = images.to(DEVICE), labels.to(DEVICE)
                 outputs = self.model(images)
-                loss_fn = CustomCategoricalCrossEntropyLoss()
-                loss = loss_fn(outputs, labels)
+                loss = self.criterion(outputs, labels)
                 losses.append(loss.item())
                 self.accuracy_metric.update(outputs, labels)
         return sum(losses) / len(losses), self.accuracy_metric.compute()
