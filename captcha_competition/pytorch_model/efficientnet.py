@@ -25,7 +25,6 @@ class EfficientNet(nn.Module):
 
         # Setup MBConv blocks dynamically
         current_filters = round(initial_filters * multiplier)
-        print(f"{current_filters=}")
         self.mb_conv_blocks = nn.Sequential(
             MBConvBlock(
                 initial_filters,
