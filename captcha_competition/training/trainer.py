@@ -37,6 +37,8 @@ class Trainer:
         self.name = name if name is not None else wandb.run.name  # type: ignore
         self.best_eval_accuracy = 0.0
 
+        self.checkpoint_path = MODELS_PATH / f"{self.name}.pt"
+
     def train(self) -> None:
         for epoch in range(self.epochs):
             self.model.train()
@@ -69,8 +71,6 @@ class Trainer:
                 self.save_checkpoint(epoch, eval_accuracy)
 
     def save_checkpoint(self, epoch: int, val_accuracy: float):
-        # Define your checkpoint path
-        checkpoint_path = MODELS_PATH / f"{self.name}.pt"
         torch.save(
             {
                 "epoch": epoch,
@@ -78,10 +78,10 @@ class Trainer:
                 "optimizer_state_dict": self.optimizer.state_dict(),
                 "val_accuracy": val_accuracy,
             },
-            checkpoint_path,
+            self.checkpoint_path,
         )
         if self.verbose:
-            print(f"Checkpoint saved: {checkpoint_path}")
+            print(f"Checkpoint saved: {self.checkpoint_path}")
 
     def training_step(
         self, images: torch.Tensor, labels: torch.Tensor
