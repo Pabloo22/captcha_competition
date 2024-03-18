@@ -4,8 +4,8 @@ import torch
 from torch.utils.data import IterableDataset, DataLoader
 import numpy as np
 
-from captcha_competition.data import (
-    generate_captcha_image,
+from captcha_competition.data import generate_captcha_image
+from captcha_competition.data.preprocessing_pipelines import (
     label_to_tensor,
     image_to_tensor,
 )
