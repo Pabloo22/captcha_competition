@@ -53,7 +53,7 @@ def get_model_name(model_params: dict, dataset_params: dict) -> str:
     return (
         f"{model_params['model_type']}_"
         f"{model_params['initial_filters']}_"
-        f"{model_params['multiplier']}_"
+        f"{str(model_params['multiplier']).replace('.', 'dot')}_"
         f"{dataset_params['dataset_type']}"
     )
 
@@ -136,23 +136,23 @@ if __name__ == "__main__":
     from torch.utils.data import DataLoader
 
     # Dataset params:
-    train_dataset_params = {
+    train_dataset_params_ = {
         "dataset_type": "real",
         "folder_name": "train",
         "remove_previously_processed": True,
     }
-    preprocessing_fc = preprocessing_fc_factory(
+    preprocessing_fc_ = preprocessing_fc_factory(
         model_type="resnet", use_full_preprocessing=True
     )
     train_dataset = dataset_factory(
-        preprocessing_fc=preprocessing_fc, **train_dataset_params  # type: ignore
+        preprocessing_fc=preprocessing_fc_, **train_dataset_params_  # type: ignore
     )
 
     # dataloader = DataLoaderHandler(train_dataset, batch_size=64, num_workers=4)
-    dataloader = DataLoader(
+    dataloader_ = DataLoader(
         train_dataset, batch_size=64, num_workers=0, shuffle=True
     )
-    for batch_idx, (images, labels) in enumerate(dataloader, start=1):
+    for batch_idx, (images, labels) in enumerate(dataloader_, start=1):
         print(f"Batch {batch_idx}:")
         print(images.shape, labels.shape)
 
