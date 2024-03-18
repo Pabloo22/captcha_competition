@@ -8,7 +8,6 @@ TENSOR_TYPE = torch.float32
 
 
 def image_to_tensor(image: np.ndarray) -> torch.Tensor:
-    # print(image.shape)
     if not is_channel_first(image):
         image = np.transpose(image, (2, 0, 1))
     return torch.tensor(image.tolist(), dtype=TENSOR_TYPE)
@@ -20,7 +19,7 @@ def is_channel_first(image: np.ndarray) -> bool:
 
 
 def label_to_tensor(label: list[int]) -> torch.Tensor:
-    return torch.tensor(label, dtype=TENSOR_TYPE)
+    return torch.tensor(label, dtype=torch.long)
 
 
 def resize(img: np.ndarray, height: int, width: int) -> np.ndarray:
