@@ -1,5 +1,4 @@
 trainer:
-  wandb_project: "captcha_solver_project"
   epochs: 10
   verbose: true
 
@@ -7,6 +6,7 @@ model:
   model_type: "resnet"  # Can be "resnet" or "efficientnet"
   initial_filters: 64
   multiplier: 2
+  in_channels: 1
 
 optimizer:
   learning_rate: 0.001
