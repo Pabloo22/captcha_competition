@@ -10,6 +10,7 @@ from captcha_competition.data.preprocessing_pipelines import (
     to_grayscale,
     apply_morphological_closing,
     resize,
+    min_max_normalize,
 )
 
 
@@ -17,6 +18,7 @@ STEPS: dict[str, Callable[[np.ndarray], np.ndarray]] = {
     "remove_background": remove_background,
     "to_grayscale": to_grayscale,
     "closing": apply_morphological_closing,
+    "min_max_normalize": min_max_normalize,
     "resize_resnet": functools.partial(resize, height=64, width=192),
     "resize_efficientnet": functools.partial(resize, height=80, width=210),
 }
