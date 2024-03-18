@@ -6,7 +6,7 @@ from captcha_competition import ConfigKeys, load_config
 from captcha_competition.training import trainer_factory
 
 
-DEFAULT_CONFIG_FILENAME = "resnet_default.yaml"
+DEFAULT_CONFIG_FILENAME = "efficientnet_default.yaml"
 
 
 def get_configuration_filename() -> str:
