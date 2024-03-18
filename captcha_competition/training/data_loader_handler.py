@@ -42,6 +42,13 @@ class DataLoaderHandler:
         )
 
     def __len__(self):
+        is_iterable = isinstance(self.dataset, IterableDataset)
+        if is_iterable:
+            if self.steps_per_epoch is None:
+                raise ValueError(
+                    "For IterableDataset, `steps_per_epoch` must be specified"
+                )
+            return self.steps_per_epoch
         return len(self.loader)
 
     def __iter__(self):
