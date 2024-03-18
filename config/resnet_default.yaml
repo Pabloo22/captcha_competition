@@ -4,7 +4,7 @@ trainer:
 
 model:
   model_type: "resnet"  # Can be "resnet" or "efficientnet"
-  initial_filters: 16
+  initial_filters: 48
   multiplier: 2
 
 optimizer:
@@ -25,8 +25,8 @@ preprocessing:
 
 train_dataset:
   remove_previously_processed: true
-  dataset_type: "synthetic"  # Can be "real" or "synthetic"
-
+  dataset_type: "real"  # Can be "real" or "synthetic"
+  folder_name: "train"  # Picks all the images from this folder and the .csv file with the same name.
 val_dataset:
   remove_previously_processed: true
   dataset_type: "real"  # Can be "real" or "synthetic"
@@ -36,5 +36,5 @@ val_dataset:
 dataloader:
   batch_size: 64
   shuffle: true
-  num_workers: 6
+  num_workers: 0
   steps_per_epoch: 50  # If any of the datasets' types is "synthetic".
