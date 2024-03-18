@@ -58,11 +58,18 @@ def get_model_name(model_params: dict, dataset_params: dict) -> str:
     )
 
 
-def model_factory(model_type: str, initial_filters: int, multiplier: float):
+def model_factory(
+    model_type: str,
+    initial_filters: int,
+    multiplier: float,
+    in_channels: int = 3,
+):
     if model_type == "resnet":
-        return ResNet(initial_filters, multiplier)
+        return ResNet(initial_filters, multiplier, in_channels=in_channels)
     if model_type == "efficientnet":
-        return EfficientNet(initial_filters, multiplier)
+        return EfficientNet(
+            initial_filters, multiplier, in_channels=in_channels
+        )
     raise ValueError(f"Model type {model_type} not supported")
 
 
