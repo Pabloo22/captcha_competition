@@ -44,12 +44,18 @@ class Trainer:
         self.accuracy_metric = CustomAccuracyMetric()
         self.verbose = verbose
 
+        self.criterion = CustomCategoricalCrossEntropyLoss()
+
         if name is None and not self.use_wandb:
             raise ValueError("Name must be provided if not using wandb")
         self.name = name if name is not None else wandb.run.name  # type: ignore
         self.best_eval_accuracy = 0.0
 
         self.checkpoint_path = MODELS_PATH / f"{self.name}.pt"
+
+        if self.use_wandb:
+            # Watch the model
+            wandb.watch(self.model, criterion=self.criterion, log="all")
 
     def train(self) -> None:
         for epoch in range(self.epochs):
@@ -108,8 +114,7 @@ class Trainer:
     ) -> float:
         self.optimizer.zero_grad()
         outputs: torch.Tensor = self.model(images)
-        loss_fn = CustomCategoricalCrossEntropyLoss()
-        loss: torch.Tensor = loss_fn(outputs, labels)
+        loss: torch.Tensor = self.criterion(outputs, labels)
         loss.backward()
         self.optimizer.step()
         self.accuracy_metric.update(outputs, labels)
