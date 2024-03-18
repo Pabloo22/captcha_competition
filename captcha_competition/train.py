@@ -24,10 +24,11 @@ def main():
     config_filename = get_configuration_filename()
     config = load_config(config_filename)
 
-    wandb.init(project="captcha_competition", config=config)
+    wandb.init(project="captcha_competition_debugging", config=config)
     trainer = trainer_factory(
         model_params=config[ConfigKeys.MODEL],
         optimizer_params=config[ConfigKeys.OPTIMIZER],
+        preprocessing_params=config[ConfigKeys.PREPROCESSING],
         train_dataset_params=config[ConfigKeys.TRAIN_DATASET],
         val_dataset_params=config[ConfigKeys.VAL_DATASET],
         dataloader_params=config[ConfigKeys.DATALOADER],
