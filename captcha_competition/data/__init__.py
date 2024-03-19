@@ -6,9 +6,6 @@ from captcha_competition.data.generate_captcha import (
     list_all_fonts,
 )
 from captcha_competition.data.preprocessing import (
-    image_to_tensor,
-    label_to_tensor,
-    generate_captcha_tensors,
     remove_bg,
     cleaned_image,
     best_of_both_worlds,
