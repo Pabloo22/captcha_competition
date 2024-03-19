@@ -28,10 +28,12 @@ class CaptchaDataset(Dataset):
         processed_data_dir: Path = DATA_PROCESSED_PATH,
         remove_previously_processed: bool = False,
         save_processed: bool = False,
+        zero_pad: int = 5,
     ):
         super().__init__()
         self.raw_data_dir = raw_data_dir
         self.raw_img_dir = os.path.join(raw_data_dir, folder_name)
+        self.zero_pad = zero_pad
 
         self.processed_data_dir = processed_data_dir
         self.processed_img_dir = os.path.join(processed_data_dir, folder_name)
@@ -53,7 +55,7 @@ class CaptchaDataset(Dataset):
         return len(self.img_labels)
 
     def __getitem__(self, idx):
-        img_name = str(self.img_labels.iloc[idx, 0]).zfill(5) + ".png"
+        img_name = str(self.img_labels.iloc[idx, 0]).zfill(self.zero_pad) + ".png"
         raw_img_path = os.path.join(self.raw_img_dir, img_name)
         processed_img_path = os.path.join(self.processed_img_dir, img_name)
 
