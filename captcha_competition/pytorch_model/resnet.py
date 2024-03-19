@@ -68,6 +68,56 @@ class ResNet(nn.Module):
         return self.softmax(x)
 
 
+class ResNetEncoder(nn.Module):
+    """The same than ResNet but without the last layers, and now we allow
+    for a custom number of resnet blocks"""
+
+    def __init__(
+        self,
+        initial_filters: int = 64,
+        multiplier: float = 2.0,
+        num_combined_blocks: int = 3,
+    ):
+        super().__init__()
+        self.conv1 = nn.Conv2d(
+            3, initial_filters, kernel_size=7, stride=2, padding=3, bias=False
+        )
+        self.bn1 = nn.BatchNorm2d(initial_filters)
+        self.pool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
+
+        # Dynamically create blocks based on initial_filters and multiplier
+        filters = initial_filters
+        self.blocks = nn.Sequential(ResNetBlock(filters, filters, stride=2))
+
+        for i in range(2, num_combined_blocks + 1):
+            previous_filters = filters
+            filters = int(round(filters * multiplier))
+            self.blocks.add_module(
+                f"combined_block{i}",
+                ResNetCombinedBlock(previous_filters, filters),
+            )
+
+    def forward(self, x):
+        x = F.relu(self.bn1(self.conv1(x)))
+        x = self.pool(x)
+        x = self.blocks(x)
+        return x
+
+
+class ResNetCombinedBlock(nn.Module):
+    """Uses two ResNetBlocks, one with stride 2 and the other with stride 1"""
+
+    def __init__(self, in_channels: int, out_channels: int):
+        super().__init__()
+        self.block1 = ResNetBlock(in_channels, out_channels, stride=2)
+        self.block2 = ResNetBlock(out_channels, out_channels, stride=1)
+
+    def forward(self, x):
+        x = self.block1(x)
+        x = self.block2(x)
+        return x
+
+
 class ResNetBlock(nn.Module):
     def __init__(
         self, in_channels: int, out_channels: int, kernel_size=(3, 3), stride=2
