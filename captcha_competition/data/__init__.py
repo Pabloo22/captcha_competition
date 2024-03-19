@@ -10,7 +10,7 @@ from captcha_competition.data.preprocessing import (
     cleaned_image,
     best_of_both_worlds,
     preprocessing,
-    preprocessing_grayscale,
+    preprocessing_tensor,
 )
 from captcha_competition.data.iterable_dataset import (
     SyntheticCaptchaIterableDataset,
