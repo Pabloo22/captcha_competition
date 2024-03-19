@@ -56,16 +56,11 @@ def to_grayscale(img: np.ndarray) -> np.ndarray:
 
 def to_grayscale_tensor(tensor: torch.Tensor) -> torch.Tensor:
     # print(f"Converting tensor to grayscale with shape {tensor.shape}")
-
-    # First, transpose the tensor BGR to RGB
-    tensor = tensor.permute(1, 2, 0)
-    # Then, convert to grayscale
-    gray_tensor = F.rgb_to_grayscale(tensor)
-
-    # Make 3 channels again
-    gray_tensor = gray_tensor.repeat(1, 1, 3)
-
-    return gray_tensor.permute(2, 0, 1)
+    grayscale_image = F.rgb_to_grayscale(tensor)
+    # Stack the grayscale image 3 times to match the original shape
+    # Use pytorch's repeat function to avoid copying the data
+    new_tensor = grayscale_image.repeat(3, 1)
+    return new_tensor
 
 
 def min_max_normalize(image: np.ndarray) -> np.ndarray:
