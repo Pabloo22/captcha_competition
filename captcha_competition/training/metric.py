@@ -16,7 +16,7 @@ class CustomAccuracyMetric:
         - targets: torch.Tensor of shape (batch_size, 6) - true labels.
         """
         with torch.no_grad():
-            predicted_classes = outputs.argmax(dim=1)
+            predicted_classes = self.get_predicted_classes(outputs)
             correct = (predicted_classes == targets).sum(dim=1)
 
             if self.per_digit:
@@ -25,6 +25,19 @@ class CustomAccuracyMetric:
             else:
                 self.correct_predictions += (correct == 6).sum().item()  # type: ignore
                 self.total_predictions += targets.size(0)
+
+    @staticmethod
+    def get_predicted_classes(outputs: torch.Tensor) -> torch.Tensor:
+        # If the model is a ResNetTransformer, the shape of the outputs tensor is
+        # (batch_size, 6, 10)
+        # Otherwise, the shape is (batch_size, 10, 6)
+        if outputs.shape[1] == 6:
+            predicted_classes = outputs.argmax(dim=2)
+        elif outputs.shape[2] == 6:
+            predicted_classes = outputs.argmax(dim=1)
+        else:
+            raise ValueError(f"Invalid input shape: {outputs.shape}")
+        return predicted_classes
 
     def compute(self) -> float:
         """

@@ -188,10 +188,7 @@ class Trainer:
         outputs: torch.Tensor,
         labels: torch.Tensor,
     ):
-        if self.model_type == "resnettransformer":
-            preds = outputs.argmax(dim=2)
-        else:
-            preds = outputs.argmax(dim=1)
+        preds = CustomAccuracyMetric.get_predicted_classes(outputs)
         incorrect_indices = (preds != labels).nonzero(as_tuple=True)[0]
         print(f"{incorrect_indices.shape =}")
         if len(incorrect_indices) > 0:
@@ -212,6 +209,6 @@ class Trainer:
             img = img.permute(1, 2, 0)
             img = img.numpy()
             img = (img * 255).astype(np.uint8)
-            caption = f"Pred: {pred.tolist()}, Label: {label.tolist()}"
+            caption = f"Prediction: {pred.tolist()}, Label: {label.tolist()}"
             log_images.append(wandb.Image(img, caption=caption))
         return log_images
