@@ -1,7 +1,8 @@
 wandb/
+data/raw/synthetic/
 data/processed/train/
 data/processed/validation/
-models/*.pt
+# models/*.pt
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
