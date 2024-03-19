@@ -1,3 +1,5 @@
+from typing import Optional
+
 import argparse
 
 import wandb
@@ -20,8 +22,9 @@ def get_configuration_filename() -> str:
     return parser.parse_args().config_filename
 
 
-def main():
-    config_filename = get_configuration_filename()
+def main(config_filename: Optional[str] = None):
+    if config_filename is None:
+        config_filename = get_configuration_filename()
     config = load_config(config_filename)
 
     wandb.init(project="captcha_competition_debugging", config=config)
