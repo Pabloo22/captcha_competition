@@ -12,7 +12,6 @@ from captcha_competition.data.preprocessing_pipelines.steps import (
     remove_background_tensor,
     to_grayscale_tensor,
     min_max_normalize_tensor,
-    apply_morphological_closing_tensor,
     resize_tensor,
     get_numbers_color_tensor,
     get_background_color_tensor,
