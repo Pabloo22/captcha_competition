@@ -74,7 +74,8 @@ class CaptchaDataset(Dataset):
     def _read_image_with_torch(img_path) -> torch.Tensor:
         image_tensor = read_image(img_path)
         image_tensor = image_tensor.float() / 255.0
-        image_tensor = image_tensor.to(DEVICE)
+        # Raises error if pin_memory is True in the DataLoader:
+        # image_tensor = image_tensor.to(DEVICE)
         return image_tensor
 
     def _get_label_tensor(self, idx):
