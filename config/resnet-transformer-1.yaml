@@ -12,22 +12,21 @@ optimizer:
   weight_decay: 0.00001
 
 preprocessing:
-  use_full_preprocessing: true
+  use_full_preprocessing: false
   # If true, equivalent to:
-  # preprocessing_steps:
-  #   - "remove_background"
-  #   - "to_grayscale"
-  #   - "closing"
-  #   - "resize_resnet"
+  preprocessing_steps:
+    - "remove_background"
+    - "resize_resnet"
   # If false, equivalent to:
   # preprocessing_steps:
   #   - "resize_resnet"
 
 train_dataset:
   remove_previously_processed: false
-  dataset_type: "synthetic"  # Can be "real" or "synthetic"
-  folder_name: "train"  # Picks all the images from this folder and the .csv file with the same name.
-  save_preprocessed: false
+  dataset_type: "real"  # Can be "real" or "synthetic"
+  folder_name: "synthetic"  # Picks all the images from this folder and the .csv file with the same name.
+  save_processed: false
+  zero_pad: 7
 val_dataset:
   remove_previously_processed: true
   dataset_type: "real"  # Can be "real" or "synthetic"
