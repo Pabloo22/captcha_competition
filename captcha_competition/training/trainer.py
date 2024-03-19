@@ -12,7 +12,11 @@ from captcha_competition.training import (
 )
 
 
-INPUT_SHAPES = {"resnet": (3, 64, 192), "efficientnet": (3, 80, 210)}
+INPUT_SHAPES = {
+    "resnet": (1, 3, 64, 192),
+    "efficientnet": (1, 3, 80, 210),
+    "resnettransformer": (1, 3, 64, 192),
+}
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -31,14 +35,14 @@ class Trainer:
         num_samples: int = 10,
     ):
         self.model = model.to(DEVICE)
+        self.model_type = model.__class__.__name__.lower()
         if verbose:
-            from torchsummary import summary  # type: ignore
+            from torchinfo import summary  # type: ignore
 
             print(f"Using device: {DEVICE}")
-            model_type = model.__class__.__name__.lower()
             summary(
                 self.model,
-                input_size=INPUT_SHAPES.get(model_type, (3, 80, 200)),
+                input_size=INPUT_SHAPES.get(self.model_type, (1, 3, 80, 200)),
             )
 
         self.optimizer = optimizer
@@ -184,7 +188,10 @@ class Trainer:
         outputs: torch.Tensor,
         labels: torch.Tensor,
     ):
-        preds = outputs.argmax(dim=1)
+        if self.model_type == "resnettransformer":
+            preds = outputs.argmax(dim=2)
+        else:
+            preds = outputs.argmax(dim=1)
         incorrect_indices = (preds != labels).nonzero(as_tuple=True)[0]
         print(f"{incorrect_indices.shape =}")
         if len(incorrect_indices) > 0:
