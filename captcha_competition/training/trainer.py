@@ -36,14 +36,18 @@ class Trainer:
 
             print(f"Using device: {DEVICE}")
             model_type = model.__class__.__name__.lower()
-            summary(self.model, input_size=INPUT_SHAPES[model_type])
+            summary(
+                self.model,
+                input_size=INPUT_SHAPES.get(model_type, (3, 80, 200)),
+            )
 
         self.optimizer = optimizer
         self.use_wandb = wandb.run is not None
         self.train_dataloader_handler = train_dataloader_handler
         self.val_dataloader_handler = val_dataloader_handler
         self.epochs = epochs
-        self.accuracy_metric = CustomAccuracyMetric()
+        self.accuracy_metric_per_digit = CustomAccuracyMetric()
+        self.accuracy_metric = CustomAccuracyMetric(per_digit=False)
         self.verbose = verbose
 
         self.criterion = CustomCategoricalCrossEntropyLoss()
@@ -77,12 +81,17 @@ class Trainer:
             # Log to wandb every epoch
             train_loss = sum(losses) / len(losses)
             train_accuracy = self.accuracy_metric.compute()
-            eval_loss, eval_accuracy, log_images = self.evaluate()
+            train_accuracy_per_digit = self.accuracy_metric_per_digit.compute()
+            eval_loss, eval_accuracy, eval_accuracy_per_digit, log_images = (
+                self.evaluate()
+            )
             if self.verbose:
                 print(
                     f"Epoch {epoch + 1}, Train Loss: {train_loss}, "
                     f"Train Accuracy: {train_accuracy}, "
-                    f"Eval Loss: {eval_loss}, Eval Accuracy: {eval_accuracy}"
+                    f"Train Accuracy per digit: {train_accuracy_per_digit}, "
+                    f"Eval Accuracy per digit: {eval_accuracy_per_digit}"
+                    f"Eval Loss: {eval_loss}, Eval Accuracy: {eval_accuracy}, "
                 )
             if self.use_wandb:
                 wandb.log(
@@ -96,31 +105,9 @@ class Trainer:
                 )
             if eval_accuracy > self.best_eval_accuracy:
                 self.best_eval_accuracy = eval_accuracy
-                self.save_checkpoint(epoch, eval_accuracy)
-
-    def save_checkpoint(self, epoch: int, val_accuracy: float):
-        torch.save(
-            {
-                "epoch": epoch,
-                "model_state_dict": self.model.state_dict(),
-                "optimizer_state_dict": self.optimizer.state_dict(),
-                "val_accuracy": val_accuracy,
-            },
-            self.checkpoint_path,
-        )
-        if self.verbose:
-            print(f"Checkpoint saved: {self.checkpoint_path}")
-
-    def training_step(
-        self, images: torch.Tensor, labels: torch.Tensor
-    ) -> float:
-        self.optimizer.zero_grad()
-        outputs: torch.Tensor = self.model(images)
-        loss: torch.Tensor = self.criterion(outputs, labels)
-        loss.backward()
-        self.optimizer.step()
-        self.accuracy_metric.update(outputs, labels)
-        return loss.item()
+                self.save_checkpoint(
+                    epoch, eval_accuracy, eval_accuracy_per_digit
+                )
 
     def evaluate(self):
         self.model.eval()
@@ -156,8 +143,37 @@ class Trainer:
         return (
             sum(losses) / len(losses),
             self.accuracy_metric.compute(),
+            self.accuracy_metric_per_digit.compute(),
             log_images,
         )
+
+    def save_checkpoint(
+        self, epoch: int, val_accuracy: float, val_accuracy_per_digit: float
+    ):
+        torch.save(
+            {
+                "epoch": epoch,
+                "model_state_dict": self.model.state_dict(),
+                "optimizer_state_dict": self.optimizer.state_dict(),
+                "val_accuracy": val_accuracy,
+                "val_accuracy_per_digit": val_accuracy_per_digit,
+            },
+            self.checkpoint_path,
+        )
+        if self.verbose:
+            print(f"Checkpoint saved: {self.checkpoint_path}")
+
+    def training_step(
+        self, images: torch.Tensor, labels: torch.Tensor
+    ) -> float:
+        self.optimizer.zero_grad()
+        outputs: torch.Tensor = self.model(images)
+        loss: torch.Tensor = self.criterion(outputs, labels)
+        loss.backward()
+        self.optimizer.step()
+        self.accuracy_metric.update(outputs, labels)
+        self.accuracy_metric_per_digit.update(outputs, labels)
+        return loss.item()
 
     def _update_incorrect_images(
         self,
