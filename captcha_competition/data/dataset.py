@@ -75,7 +75,7 @@ class CaptchaDataset(Dataset):
         image_tensor = read_image(img_path)
         image_tensor = image_tensor.float() / 255.0
         # Raises error if pin_memory is True in the DataLoader:
-        # image_tensor = image_tensor.to(DEVICE)
+        image_tensor = image_tensor.to(DEVICE)
         return image_tensor
 
     def _get_label_tensor(self, idx):

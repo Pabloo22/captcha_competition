@@ -11,12 +11,14 @@ class DataLoaderHandler:
         shuffle: bool = True,
         num_workers: int = 4,
         steps_per_epoch: Optional[int] = None,
+        pin_memory: bool = False,
     ):
         self.dataset = dataset
         self.batch_size = batch_size
         self.shuffle = shuffle
         self.num_workers = num_workers
         self.steps_per_epoch = steps_per_epoch
+        self.pin_memory = pin_memory
         self.loader = self._create_dataloader()
 
         self._iter_loader = None
@@ -39,7 +41,7 @@ class DataLoaderHandler:
             # Shuffle only for non-iterable datasets
             shuffle=not is_iterable and self.shuffle,
             num_workers=self.num_workers,
-            pin_memory=True,
+            pin_memory=self.pin_memory,
         )
 
     def __len__(self):
