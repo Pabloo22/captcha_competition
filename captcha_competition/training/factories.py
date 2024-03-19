@@ -4,7 +4,11 @@ from pathlib import Path
 import torch
 import numpy as np
 
-from captcha_competition.pytorch_model import ResNet, EfficientNet
+from captcha_competition.pytorch_model import (
+    ResNet,
+    EfficientNet,
+    ResNetTransformer,
+)
 from captcha_competition.data import (
     CaptchaDataset,
     SyntheticCaptchaIterableDataset,
@@ -58,18 +62,13 @@ def get_model_name(model_params: dict, dataset_params: dict) -> str:
     )
 
 
-def model_factory(
-    model_type: str,
-    initial_filters: int,
-    multiplier: float,
-    in_channels: int = 3,
-):
+def model_factory(model_type: str, **model_params):
     if model_type == "resnet":
-        return ResNet(initial_filters, multiplier, in_channels=in_channels)
+        return ResNet(**model_params)
     if model_type == "efficientnet":
-        return EfficientNet(
-            initial_filters, multiplier, in_channels=in_channels
-        )
+        return EfficientNet(**model_params)
+    if model_type == "resnettransformer":
+        return ResNetTransformer(**model_params)
     raise ValueError(f"Model type {model_type} not supported")
 
 
@@ -87,6 +86,7 @@ def dataset_factory(
     folder_name: str = "train",
     data_path: Path = DATA_RAW_PATH,
     remove_previously_processed: bool = False,
+    save_processed: bool = True,
 ):
     if dataset_type == "real":
         return CaptchaDataset(
@@ -94,6 +94,7 @@ def dataset_factory(
             folder_name=folder_name,
             preprocessing_fc=preprocessing_fc,
             remove_previously_processed=remove_previously_processed,
+            save_processed=save_processed,
         )
     if dataset_type == "synthetic":
         return SyntheticCaptchaIterableDataset(
