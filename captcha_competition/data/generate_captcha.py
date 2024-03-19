@@ -4,7 +4,6 @@ import functools
 from pathlib import Path
 import numpy as np
 
-import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 import torch
 
@@ -104,9 +103,26 @@ def list_all_fonts(fonts_dir=FONTS_PATH) -> list[Path]:
 
 
 if __name__ == "__main__":
-    from captcha_competition.data.visualization import plot_image
-    import matplotlib.pyplot as plt
-    captcha_image, numbers_ = generate_captcha_image()
-    plot_image(captcha_image)
-    plt.show()
-    print(numbers_)
+    from captcha_competition import DATA_RAW_PATH
+    import pandas as pd
+    import tqdm  # type: ignore
+    from pathlib import Path
+
+    num_images = 1_000_000
+    labels: list[tuple[int, str]] = []
+    # Create DATA_RAW_PATH / "synthetic" directory if it does not exis
+    # DATA_RAW_PATH = Path(
+    #     "/home/pablo/VSCodeProjects/captcha_competition/data/raw/"
+    # )
+    print(DATA_RAW_PATH / "synthetic")
+    os.makedirs(DATA_RAW_PATH / "synthetic", exist_ok=True)
+
+    try:
+        for i in tqdm.trange(num_images):
+            image, numbers = generate_captcha_image()
+            image_path = DATA_RAW_PATH / "synthetic" / f"{i:07}.png"
+            Image.fromarray(image).save(image_path)
+            labels.append((i, "".join(map(str, numbers))))
+    finally:
+        labels_df = pd.DataFrame(labels, columns=["Id", "Label"])
+        labels_df.to_csv(DATA_RAW_PATH / "synthetic.csv", index=False)
