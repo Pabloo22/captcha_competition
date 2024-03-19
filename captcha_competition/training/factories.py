@@ -91,6 +91,7 @@ def dataset_factory(
     data_path: Path = DATA_RAW_PATH,
     remove_previously_processed: bool = False,
     save_processed: bool = True,
+    zero_pad: int = 5,
 ):
     if dataset_type == "real":
         return CaptchaDataset(
@@ -99,6 +100,7 @@ def dataset_factory(
             preprocessing_fc=preprocessing_fc,
             remove_previously_processed=remove_previously_processed,
             save_processed=save_processed,
+            zero_pad=zero_pad,
         )
     if dataset_type == "synthetic":
         return SyntheticCaptchaIterableDataset(
@@ -125,7 +127,7 @@ def preprocessing_fc_factory(
     else:
         preprocessing_steps = []
 
-    if model_type == "resnet":
+    if "resnet" in model_type:
         preprocessing_steps.append("resize_resnet")
     elif model_type == "efficientnet":
         preprocessing_steps.append("resize_efficientnet")
