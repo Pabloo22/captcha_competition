@@ -29,6 +29,20 @@ def resize(img: np.ndarray, height: int, width: int) -> np.ndarray:
     return new_image
 
 
+def resize_tensor(
+    tensor: torch.Tensor, height: int, width: int
+) -> torch.Tensor:
+    # print(f"Resizing tensor from {tensor.shape} to ({height}, {width})")
+    new_tensor = torch.nn.functional.interpolate(
+        tensor.unsqueeze(0),
+        size=(height, width),
+        mode="bilinear",
+        align_corners=False,
+    )
+    new_tensor = new_tensor.squeeze(0)
+    return new_tensor
+
+
 def to_grayscale(img: np.ndarray) -> np.ndarray:
     # print(f"Converting image to grayscale with shape {img.shape}")
     new_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
