@@ -2,9 +2,10 @@ import torch
 
 
 class CustomAccuracyMetric:
-    def __init__(self):
+    def __init__(self, per_digit: bool = True):
         self.correct_predictions = 0
         self.total_predictions = 0
+        self.per_digit = per_digit
 
     def update(self, outputs: torch.Tensor, targets: torch.Tensor) -> None:
         """
@@ -15,18 +16,15 @@ class CustomAccuracyMetric:
         - targets: torch.Tensor of shape (batch_size, 6) - true labels.
         """
         with torch.no_grad():
-            predicted_classes = outputs.argmax(
-                dim=1
-            )  # Get the predicted classes for each column
-            correct = (predicted_classes == targets).sum(
-                dim=1
-            )  # Sum correct predictions per sample
-            self.correct_predictions += (
-                correct.sum().item()
-            )  # Update total correct predictions
-            self.total_predictions += (
-                targets.numel()
-            )  # Update total number of predictions
+            predicted_classes = outputs.argmax(dim=1)
+            correct = (predicted_classes == targets).sum(dim=1)
+
+            if self.per_digit:
+                self.correct_predictions += correct.sum().item()  # type: ignore
+                self.total_predictions += targets.numel()
+            else:
+                self.correct_predictions += (correct == 6).sum().item()  # type: ignore
+                self.total_predictions += targets.size(0)
 
     def compute(self) -> float:
         """
@@ -48,7 +46,9 @@ class CustomAccuracyMetric:
         self.total_predictions = 0
 
 
-def custom_accuracy(outputs: torch.Tensor, targets: torch.Tensor) -> float:
+def custom_accuracy(
+    outputs: torch.Tensor, targets: torch.Tensor, per_digit: bool = True
+) -> float:
     """
     Compute the accuracy metric.
 
@@ -59,6 +59,6 @@ def custom_accuracy(outputs: torch.Tensor, targets: torch.Tensor) -> float:
     Returns:
     - The accuracy as a float.
     """
-    accuracy_metric = CustomAccuracyMetric()
+    accuracy_metric = CustomAccuracyMetric(per_digit)
     accuracy_metric.update(outputs, targets)
     return accuracy_metric.compute()
