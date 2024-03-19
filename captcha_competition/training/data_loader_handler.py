@@ -39,6 +39,7 @@ class DataLoaderHandler:
             # Shuffle only for non-iterable datasets
             shuffle=not is_iterable and self.shuffle,
             num_workers=self.num_workers,
+            pin_memory=True,
         )
 
     def __len__(self):
