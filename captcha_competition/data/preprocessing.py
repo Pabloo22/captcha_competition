@@ -127,9 +127,7 @@ def preprocessing(image: np.ndarray, kernel_size=5) -> np.ndarray:
     return new_image
 
 
-def preprocessing_grayscale(
-    image: torch.Tensor, kernel_size=5
-) -> torch.Tensor:
+def preprocessing_grayscale(image: torch.Tensor) -> torch.Tensor:
     # Convert the image to grayscale
     image = torch.mean(image, dim=2, keepdim=True)
 
@@ -148,7 +146,7 @@ def preprocessing_grayscale(
     color_mode = torch.tensor(
         [
             value
-            for value, frequency in torch.sum(color_counter, dim=0).topk(2)[0]
+            for value, _ in torch.sum(color_counter, dim=0).topk(2)[0]
         ]
     )
 
@@ -166,42 +164,7 @@ def preprocessing_grayscale(
         new_image > threshold_value, torch.tensor(255), torch.tensor(0)
     ).byte()
 
-    # Morphological opening
-    kernel = torch.ones(1, 1, kernel_size, kernel_size)
-    new_image = F.morphology_opening(
-        new_image.unsqueeze(0).unsqueeze(0), kernel
-    ).squeeze()
-
     return new_image
-
-
-############ Others ############
-
-
-def generate_captcha_tensors(
-    preprocessing_fc=None,
-) -> tuple[torch.Tensor, torch.Tensor]:
-    image, label = generate_captcha_image()
-    tensor_label = label_to_tensor(label)
-    if preprocessing_fc is not None:
-        image = preprocessing_fc(image)
-    tensor_image = image_to_tensor(image)
-    return tensor_image, tensor_label
-
-
-def label_to_tensor(label: list[int]) -> torch.Tensor:
-    return torch.tensor(label, dtype=TENSOR_TYPE)
-
-
-def image_to_tensor(image: np.ndarray) -> torch.Tensor:
-    image_channel_first = np.transpose(image, (2, 0, 1))
-    return torch.tensor(image_channel_first.tolist(), dtype=TENSOR_TYPE)
-
-
-def image_to_tensor(image: np.ndarray) -> torch.Tensor:
-    image_channel_first = np.transpose(image, (2, 0, 1))
-    return torch.tensor(image_channel_first.tolist(), dtype=TENSOR_TYPE)
-
 
 ############ Testing ############
 
