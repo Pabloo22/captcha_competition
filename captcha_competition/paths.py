@@ -1,4 +1,5 @@
 """Set the project path in the .env file."""
+
 import os
 import pathlib
 from dotenv import load_dotenv
@@ -16,4 +17,8 @@ DATA_PROCESSED_PATH = DATA_PATH / "processed"
 MODELS_PATH = PROJECT_PATH / "models"
 CONFIG_PATH = PROJECT_PATH / "config"
 SCRIPTS_PATH = PROJECT_PATH / "scripts"
-FONTS_PATH =DATA_PATH / "fonts"
+FONTS_PATH = DATA_PATH / "fonts"
+
+
+if __name__ == "__main__":
+    print(PROJECT_PATH)
