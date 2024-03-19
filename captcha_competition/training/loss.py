@@ -21,11 +21,10 @@ class CustomCategoricalCrossEntropyLoss(torch.nn.Module):
                 predictions = inputs[:, i, :]
             else:
                 raise ValueError(f"Invalid input shape: {inputs.shape}")
-
-            targets = targets[:, i]
+            target_vectors = targets[:, i]
 
             # Apply categorical cross-entropy for each column
-            loss = F.cross_entropy(predictions, targets)
+            loss = F.cross_entropy(predictions, target_vectors)
             losses.append(loss)
 
         # Calculate the mean loss across all columns
