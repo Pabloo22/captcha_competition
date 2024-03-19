@@ -2,6 +2,7 @@ wandb/
 data/raw/synthetic/
 data/processed/train/
 data/processed/validation/
+data/raw/synthetic.csv
 # models/*.pt
 # Byte-compiled / optimized / DLL files
 __pycache__/
