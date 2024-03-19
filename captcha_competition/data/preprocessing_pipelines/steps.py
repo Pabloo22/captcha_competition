@@ -121,6 +121,27 @@ def remove_background_tensor(tensor: torch.Tensor) -> torch.Tensor:
     return new_tensor
 
 
+def remove_only_background_tensor(tensor: torch.Tensor) -> torch.Tensor:
+    # Get the background color for the tensor
+    background_color = get_background_color_tensor(tensor)
+    # Expand background_color to match tensor dimensions for broadcasting
+    background_color_expanded = (
+        background_color.unsqueeze(1).unsqueeze(2).expand_as(tensor)
+    )
+    # Create a mask where the tensor matches the background color
+    mask = torch.all(tensor == background_color_expanded, dim=0)
+    # Invert the mask (logical NOT) to target the background for removal
+    inverted_mask = ~mask
+    # Stack the inverted mask to match the tensor's shape for multiplication
+    inverted_mask_stacked = torch.stack(
+        [inverted_mask, inverted_mask, inverted_mask], dim=0
+    )
+    # Apply the inverted mask: set background pixels to zero
+    new_tensor = tensor * inverted_mask_stacked
+
+    return new_tensor
+
+
 # --- Helper functions ---
 
 

@@ -121,8 +121,6 @@ def preprocessing(image: np.ndarray, kernel_size=5) -> np.ndarray:
         _, new_image = cv2.threshold(
             new_image, color_mode[0], 255, cv2.THRESH_BINARY_INV
         )
-    kernel = np.ones((4, 4), np.uint8)
-    new_image = cv2.morphologyEx(new_image, cv2.MORPH_OPEN, kernel)
     # Return the binarized image
     return new_image
 
