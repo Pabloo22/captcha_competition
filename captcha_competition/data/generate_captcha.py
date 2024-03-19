@@ -106,7 +106,6 @@ if __name__ == "__main__":
     from captcha_competition import DATA_RAW_PATH
     import pandas as pd
     import tqdm  # type: ignore
-    from pathlib import Path
 
     num_images = 1_000_000
     labels: list[tuple[int, str]] = []
@@ -119,10 +118,10 @@ if __name__ == "__main__":
 
     try:
         for i in tqdm.trange(num_images):
-            image, numbers = generate_captcha_image()
+            image_, numbers_ = generate_captcha_image()
             image_path = DATA_RAW_PATH / "synthetic" / f"{i:07}.png"
-            Image.fromarray(image).save(image_path)
-            labels.append((i, "".join(map(str, numbers))))
+            Image.fromarray(image_).save(image_path)
+            labels.append((i, "".join(map(str, numbers_))))
     finally:
         labels_df = pd.DataFrame(labels, columns=["Id", "Label"])
         labels_df.to_csv(DATA_RAW_PATH / "synthetic.csv", index=False)
