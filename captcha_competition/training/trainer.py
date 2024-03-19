@@ -66,7 +66,7 @@ class Trainer:
         self.num_samples = num_samples
 
         if self.use_wandb:
-            wandb.watch(self.model, criterion=self.criterion, log="all")
+            wandb.watch(self.model, criterion=self.criterion, log="all", log_freq=10)
 
     def train(self) -> None:
         for epoch in range(self.epochs):
@@ -104,6 +104,8 @@ class Trainer:
                         "train_accuracy": train_accuracy,
                         "eval_loss": eval_loss,
                         "eval_accuracy": eval_accuracy,
+                        "train_accuracy_per_digit": train_accuracy_per_digit,
+                        "eval_accuracy_per_digit": eval_accuracy_per_digit,
                         "incorrect_images": log_images,
                     }
                 )
