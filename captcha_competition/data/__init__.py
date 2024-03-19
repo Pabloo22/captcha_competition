@@ -6,13 +6,13 @@ from captcha_competition.data.generate_captcha import (
     list_all_fonts,
 )
 from captcha_competition.data.preprocessing import (
-    remove_bg_v1,
     image_to_tensor,
     label_to_tensor,
     generate_captcha_tensors,
-    remove_bg_to_tensor,
+    remove_bg,
     cleaned_image,
-    preprocessing_image,
+    best_of_both_worlds,
+    preprocessing,
 )
 from captcha_competition.data.iterable_dataset import (
     SyntheticCaptchaIterableDataset,
