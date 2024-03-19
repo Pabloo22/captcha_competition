@@ -9,6 +9,14 @@ from captcha_competition.data.preprocessing_pipelines.steps import (
     get_numbers_color,
     get_background_color,
     get_most_common_colors,
+    remove_background_tensor,
+    to_grayscale_tensor,
+    min_max_normalize_tensor,
+    apply_morphological_closing_tensor,
+    resize_tensor,
+    get_numbers_color_tensor,
+    get_background_color_tensor,
+    get_most_common_colors_tensor,
 )
 
 from captcha_competition.data.preprocessing_pipelines.pipelines import (

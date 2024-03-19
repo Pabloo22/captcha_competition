@@ -1,4 +1,5 @@
 import torch
+import torch.functional as F
 
 import numpy as np
 import cv2
@@ -53,6 +54,20 @@ def to_grayscale(img: np.ndarray) -> np.ndarray:
     return new_img
 
 
+def to_grayscale_tensor(tensor: torch.Tensor) -> torch.Tensor:
+    # print(f"Converting tensor to grayscale with shape {tensor.shape}")
+
+    # First, transpose the tensor BGR to RGB
+    tensor = tensor.permute(1, 2, 0)
+    # Then, convert to grayscale
+    gray_tensor = F.rgb_to_grayscale(tensor)
+
+    # Make 3 channels again
+    gray_tensor = gray_tensor.repeat(1, 1, 3)
+
+    return gray_tensor.permute(2, 0, 1)
+
+
 def min_max_normalize(image: np.ndarray) -> np.ndarray:
     """Normalize image pixel values using min-max scaling to [0, 1] range."""
     # Ensure image is a float type before normalization
@@ -67,12 +82,32 @@ def min_max_normalize(image: np.ndarray) -> np.ndarray:
     return normalized_image
 
 
+def min_max_normalize_tensor(tensor: torch.Tensor) -> torch.Tensor:
+    """Normalize tensor pixel values using min-max scaling to [0, 1] range."""
+    # Ensure tensor is a float type before normalization
+    tensor = tensor.float()
+    min_val = torch.min(tensor)
+    max_val = torch.max(tensor)
+    # Avoid division by zero in case the tensor has a constant value
+    if max_val - min_val != 0:
+        normalized_tensor = (tensor - min_val) / (max_val - min_val)
+    else:
+        normalized_tensor = tensor - min_val
+    return normalized_tensor
+
+
 def apply_morphological_closing(img: np.ndarray) -> np.ndarray:
     # print(f"Applying morphological closing to image with shape {img.shape}")
     kernel = np.ones((3, 3), np.uint8)
     new_img = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)
     # print("Output shape:", new_img.shape)
     return new_img
+
+
+def apply_morphological_closing_tensor(tensor: torch.Tensor) -> torch.Tensor:
+    kernel = torch.ones(3, 3)
+    new_tensor = F.morphology(tensor, kernel, "closing")
+    return new_tensor
 
 
 def remove_background(img: np.ndarray) -> np.ndarray:
@@ -82,6 +117,15 @@ def remove_background(img: np.ndarray) -> np.ndarray:
     new_img = img * mask
 
     return new_img
+
+
+def remove_background_tensor(tensor: torch.Tensor) -> torch.Tensor:
+    numbers_color = get_numbers_color_tensor(tensor)
+    mask = torch.all(tensor == numbers_color, dim=0)
+    mask = torch.stack([mask, mask, mask], dim=0)
+    new_tensor = tensor * mask
+
+    return new_tensor
 
 
 # --- Helper functions ---
@@ -97,6 +141,16 @@ def get_numbers_color(img: np.ndarray):
     return first_color
 
 
+def get_numbers_color_tensor(tensor: torch.Tensor):
+    background_color = get_background_color_tensor(tensor)
+    colors, _ = get_most_common_colors_tensor(tensor, n=2)
+
+    first_color, second_color = colors
+    if torch.all(first_color == background_color):
+        return second_color
+    return first_color
+
+
 def get_background_color(img: np.ndarray):
     height = img.shape[0]
     top = img[: height // 4]
@@ -104,6 +158,19 @@ def get_background_color(img: np.ndarray):
 
     top_color, top_count = get_most_common_colors(top, n=1)
     bottom_color, bottom_count = get_most_common_colors(bottom, n=1)
+
+    if top_count[0] > bottom_count[0]:
+        return top_color[0]
+    return bottom_color[0]
+
+
+def get_background_color_tensor(tensor: torch.Tensor):
+    height = tensor.shape[1]
+    top = tensor[:, : height // 4]
+    bottom = tensor[:, 3 * height // 4 :]
+
+    top_color, top_count = get_most_common_colors_tensor(top, n=1)
+    bottom_color, bottom_count = get_most_common_colors_tensor(bottom, n=1)
 
     if top_count[0] > bottom_count[0]:
         return top_color[0]
@@ -127,3 +194,24 @@ def get_most_common_colors(img: np.ndarray, n: int = 1):
     n = min(n, len(unique))
     sorted_indices = np.argsort(counts)[-n:]
     return unique[sorted_indices][::-1], counts[sorted_indices][::-1]
+
+
+def get_most_common_colors_tensor(tensor: torch.Tensor, n: int = 1):
+    """Finds the n most common colors in the tensor.
+
+    Parameters:
+    - tensor: The tensor array.
+    - n: The number of top common colors to return.
+
+    Returns:
+    - A tuple of two arrays:
+        - The first array contains the top n most common colors.
+        - The second array contains the counts of these colors.
+    """
+    unique, counts = torch.unique(
+        tensor.reshape(3, -1), dim=1, return_counts=True
+    )
+    # Ensure n does not exceed the number of unique colors
+    n = min(n, len(unique))
+    sorted_indices = torch.argsort(counts)[-n:]
+    return unique[:, sorted_indices].T.flip(0), counts[sorted_indices].flip(0)
