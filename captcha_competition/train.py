@@ -27,7 +27,7 @@ def main(config_filename: Optional[str] = None):
         config_filename = get_configuration_filename()
     config = load_config(config_filename)
 
-    wandb.init(project="captcha_competition_debugging", config=config)
+    wandb.init(project="captcha_competition_tuesday", config=config)
 
     # The name is the name of the configuration file without the extension
     model_name = config_filename.split(".")[0]
