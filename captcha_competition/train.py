@@ -8,7 +8,7 @@ from captcha_competition import ConfigKeys, load_config
 from captcha_competition.training import trainer_factory
 
 
-DEFAULT_CONFIG_FILENAME = "resnet-transformer-1.yaml"
+DEFAULT_CONFIG_FILENAME = "resnet-transformer-2.yaml"
 
 
 def get_configuration_filename() -> str:
@@ -27,7 +27,7 @@ def main(config_filename: Optional[str] = None):
         config_filename = get_configuration_filename()
     config = load_config(config_filename)
 
-    # wandb.init(project="captcha_competition_tuesday", config=config)
+    wandb.init(project="captcha_competition_tuesday", config=config)
 
     # The name is the name of the configuration file without the extension
     model_name = config_filename.split(".")[0]
