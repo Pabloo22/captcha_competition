@@ -28,6 +28,12 @@ def main(config_filename: Optional[str] = None):
     config = load_config(config_filename)
 
     wandb.init(project="captcha_competition_debugging", config=config)
+
+    # The name is the name of the configuration file without the extension
+    model_name = config_filename.split(".")[0]
+    if wandb.run is not None:
+        wandb.run.name = model_name
+
     trainer = trainer_factory(
         model_params=config[ConfigKeys.MODEL],
         optimizer_params=config[ConfigKeys.OPTIMIZER],
@@ -36,6 +42,7 @@ def main(config_filename: Optional[str] = None):
         val_dataset_params=config[ConfigKeys.VAL_DATASET],
         dataloader_params=config[ConfigKeys.DATALOADER],
         trainer_params=config[ConfigKeys.TRAINER],
+        model_name=config_filename.split(".")[0],
     )
     trainer.train()
 

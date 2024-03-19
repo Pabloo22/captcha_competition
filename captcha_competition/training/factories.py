@@ -28,6 +28,7 @@ def trainer_factory(
     val_dataset_params: dict,
     dataloader_params: dict,
     trainer_params: dict,
+    model_name: Optional[str] = None,
 ):
     model = model_factory(**model_params)
     optimizer = optimizer_factory(model, **optimizer_params)
@@ -43,12 +44,15 @@ def trainer_factory(
         preprocessing_fc=preprocessing_fc, **val_dataset_params
     )
     val_dataloader = DataLoaderHandler(test_dataset, **dataloader_params)
+
+    if model_name is None:
+        model_name = get_model_name(model_params, train_dataset_params)
     return Trainer(
         model=model,
         optimizer=optimizer,
         train_dataloader_handler=dataloader,
         val_dataloader_handler=val_dataloader,
-        name=get_model_name(model_params, train_dataset_params),
+        name=model_name,
         **trainer_params,
     )
 
