@@ -7,19 +7,25 @@ class CustomCategoricalCrossEntropyLoss(torch.nn.Module):
         super().__init__()
 
     def forward(self, inputs, targets):
-        # inputs shape: (batch_size, 10, 6) - predictions
-        # targets shape: (batch_size, 6) - true labels
+        # inputs shape: (batch_size, 10, 6) or (batch_size, 6, 10)
+        # targets shape: (batch_size, 6)
 
-        _, _, num_columns = inputs.shape
+        _, num_rows, num_columns = inputs.shape
         losses = []
 
-        for i in range(num_columns):
+        for i in range(6):
             # Slice the predictions and labels for each column
-            predictions_column = inputs[:, :, i]
-            targets_column = targets[:, i]
+            if num_columns == 6:
+                predictions = inputs[:, :, i]
+            elif num_rows == 6:
+                predictions = inputs[:, i, :]
+            else:
+                raise ValueError(f"Invalid input shape: {inputs.shape}")
+
+            targets = targets[:, i]
 
             # Apply categorical cross-entropy for each column
-            loss = F.cross_entropy(predictions_column, targets_column)
+            loss = F.cross_entropy(predictions, targets)
             losses.append(loss)
 
         # Calculate the mean loss across all columns
