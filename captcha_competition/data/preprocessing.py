@@ -127,7 +127,7 @@ def preprocessing(image: np.ndarray, kernel_size=5) -> np.ndarray:
     return new_image
 
 
-def preprocessing_grayscale(image: torch.Tensor) -> torch.Tensor:
+def preprocessing_tensor(image: torch.Tensor) -> torch.Tensor:
     # Convert the image to grayscale
     image = torch.mean(image, dim=2, keepdim=True)
 
@@ -144,10 +144,7 @@ def preprocessing_grayscale(image: torch.Tensor) -> torch.Tensor:
 
     # Calculate the most common color in the image.
     color_mode = torch.tensor(
-        [
-            value
-            for value, _ in torch.sum(color_counter, dim=0).topk(2)[0]
-        ]
+        [value for value, _ in torch.sum(color_counter, dim=0).topk(2)[0]]
     )
 
     # Copy the image
@@ -165,6 +162,7 @@ def preprocessing_grayscale(image: torch.Tensor) -> torch.Tensor:
     ).byte()
 
     return new_image
+
 
 ############ Testing ############
 
