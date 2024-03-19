@@ -92,6 +92,7 @@ def dataset_factory(
     remove_previously_processed: bool = False,
     save_processed: bool = True,
     zero_pad: int = 5,
+    only_tensors: bool = False,
 ):
     if dataset_type == "real":
         return CaptchaDataset(
@@ -101,6 +102,7 @@ def dataset_factory(
             remove_previously_processed=remove_previously_processed,
             save_processed=save_processed,
             zero_pad=zero_pad,
+            only_tensors=only_tensors,
         )
     if dataset_type == "synthetic":
         return SyntheticCaptchaIterableDataset(

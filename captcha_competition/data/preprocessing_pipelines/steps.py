@@ -1,5 +1,4 @@
 import torch
-import torch.functional as F
 
 import numpy as np
 import cv2
@@ -33,7 +32,6 @@ def resize(img: np.ndarray, height: int, width: int) -> np.ndarray:
 def resize_tensor(
     tensor: torch.Tensor, height: int, width: int
 ) -> torch.Tensor:
-    # print(f"Resizing tensor from {tensor.shape} to ({height}, {width})")
     new_tensor = torch.nn.functional.interpolate(
         tensor.unsqueeze(0),
         size=(height, width),
