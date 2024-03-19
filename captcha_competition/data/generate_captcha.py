@@ -117,11 +117,11 @@ if __name__ == "__main__":
     os.makedirs(DATA_RAW_PATH / "synthetic", exist_ok=True)
 
     try:
-        for i in tqdm.trange(num_images):
+        for i_ in tqdm.trange(num_images):
             image_, numbers_ = generate_captcha_image()
-            image_path = DATA_RAW_PATH / "synthetic" / f"{i:07}.png"
+            image_path = DATA_RAW_PATH / "synthetic" / f"{i_:07}.png"
             Image.fromarray(image_).save(image_path)
-            labels.append((i, "".join(map(str, numbers_))))
+            labels.append((i_, "".join(map(str, numbers_))))
     finally:
         labels_df = pd.DataFrame(labels, columns=["Id", "Label"])
         labels_df.to_csv(DATA_RAW_PATH / "synthetic.csv", index=False)
