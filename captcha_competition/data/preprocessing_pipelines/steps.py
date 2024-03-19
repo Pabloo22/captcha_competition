@@ -105,12 +105,6 @@ def apply_morphological_closing(img: np.ndarray) -> np.ndarray:
     return new_img
 
 
-def apply_morphological_closing_tensor(tensor: torch.Tensor) -> torch.Tensor:
-    kernel = torch.ones(3, 3)
-    new_tensor = F.morphology(tensor, kernel, "closing")
-    return new_tensor
-
-
 def remove_background(img: np.ndarray) -> np.ndarray:
     numbers_color = get_numbers_color(img)
     mask = np.all(img == numbers_color, axis=-1)
