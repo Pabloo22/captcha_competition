@@ -56,11 +56,17 @@ def to_grayscale(img: np.ndarray) -> np.ndarray:
 
 def to_grayscale_tensor(tensor: torch.Tensor) -> torch.Tensor:
     # print(f"Converting tensor to grayscale with shape {tensor.shape}")
-    grayscale_image = F.rgb_to_grayscale(tensor)
-    # Stack the grayscale image 3 times to match the original shape
-    # Use pytorch's repeat function to avoid copying the data
-    new_tensor = grayscale_image.repeat(3, 1)
-    return new_tensor
+    # 0.299 * R + 0.587 * G + 0.114 * B
+    # First convert to float
+    tensor = tensor.float()
+    grayscale_tensor = (
+        0.299 * tensor[0] + 0.587 * tensor[1] + 0.114 * tensor[2]
+    )
+
+    # Stack the grayscale tensor 3 times using pytorch's repeat
+    grayscale_tensor = grayscale_tensor.unsqueeze(0)
+    grayscale_tensor = grayscale_tensor.repeat(3, 1, 1)
+    return grayscale_tensor
 
 
 def min_max_normalize(image: np.ndarray) -> np.ndarray:
