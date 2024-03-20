@@ -1,0 +1,53 @@
+trainer:
+  epochs: 100000
+  verbose: true
+
+model:
+  model_type: "resnettransformer"  # Can be "resnet", "efficientnet" or "resnettransformer"
+  initial_filters: 20
+  multiplier: 2
+  n_head: 2
+  dropout: 0.125
+  embedding_size: 64
+  num_layers: 2
+  batch_first: true
+
+optimizer:
+  learning_rate: 0.00025
+  weight_decay: 0.00001
+
+preprocessing:
+  use_full_preprocessing: false
+  # If true, equivalent to:
+  preprocessing_steps:
+    - "remove_only_background_tensor"
+    - "keep_top_colors_tensor"
+    - "resize_resnet_tensor"
+  # If false, equivalent to:
+  # preprocessing_steps:
+  #   - "resize_resnet"
+
+train_dataset:
+  remove_previously_processed: false
+  dataset_type: "real"  # Can be "real" or "synthetic"
+  folder_name: "train_kaggle"  # Picks all the images from this folder and the .csv file with the same name.
+  save_processed: false
+  zero_pad: 5
+  only_tensors: true
+val_dataset:
+  remove_previously_processed: true
+  dataset_type: "real"  # Can be "real" or "synthetic"
+  folder_name: "validation_kaggle"  # Picks all the images from this folder and the .csv file with the same name.
+  only_tensors: true
+test_dataset:
+  remove_previously_processed: true
+  dataset_type: "real"  # Can be "real" or "synthetic"
+  folder_name: "test"  # Picks all the images from this folder and the .csv file with the same name.
+  only_tensors: true
+dataloader:
+  batch_size: 16
+  shuffle: true
+  num_workers: 0
+  steps_per_epoch: null
+  pin_memory: false
+
