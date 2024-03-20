@@ -21,7 +21,6 @@ preprocessing:
   # If false, equivalent to:
   # preprocessing_steps:
   #   - "resize_resnet"
-
 train_dataset:
   remove_previously_processed: false
   dataset_type: "real"  # Can be "real" or "synthetic"
@@ -40,8 +39,9 @@ test_dataset:
   folder_name: "test"  # Picks all the images from this folder and the .csv file with the same name.
   only_tensors: true
 dataloader:
-  batch_size: 128
+  batch_size: 64
   shuffle: true
   num_workers: 0
   steps_per_epoch: null
   pin_memory: false
+
