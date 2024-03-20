@@ -32,6 +32,9 @@ def resize(img: np.ndarray, height: int, width: int) -> np.ndarray:
 def resize_tensor(
     tensor: torch.Tensor, height: int, width: int
 ) -> torch.Tensor:
+    # print(
+    #     f"Resizing tensor from {tensor.unsqueeze(0).shape} to ({height}, {width})"
+    # )
     new_tensor = torch.nn.functional.interpolate(
         tensor.unsqueeze(0),
         size=(height, width),
@@ -194,24 +197,21 @@ def keep_top_colors_tensor(
     Returns:
     - A tensor with all but the top n most common colors set to zero.
     """
-    # Get the top n most common colors and their counts
     top_colors, _ = get_most_common_colors_tensor(tensor, n=n)
 
-    # Initialize a mask of zeros with the same shape as the tensor
-    mask = torch.zeros_like(tensor, dtype=torch.bool)
+    # Initialize a mask of zeros with the shape [height, width],
+    # same spatial dimensions as the tensor
+    mask = torch.zeros(tensor.shape[1:], dtype=torch.bool, device=DEVICE)
 
-    # Iterate through the top n colors and update the mask
+    # Iterate through the top n colors
     for color in top_colors:
-        # Expand color to match tensor dimensions for broadcasting
-        color_expanded = color.unsqueeze(1).unsqueeze(2).expand_as(tensor)
         # Update the mask to True where the tensor matches one of the top n colors
-        mask |= torch.all(tensor == color_expanded, dim=0)
+        # Note: Use broadcasting for comparison without altering the tensor shape
+        mask |= torch.all(tensor == color[:, None, None], dim=0)
 
-    # Stack the mask to match the tensor's shape for application
-    mask_stacked = torch.stack([mask, mask, mask], dim=0)
-
-    # Apply the mask to the tensor, setting non-top n colors to zero
-    new_tensor = tensor * mask_stacked
+    # Apply the mask to the tensor by exploiting broadcasting, 
+    # preserving the original tensor shape
+    new_tensor = tensor * mask[None, :, :]
 
     return new_tensor
 
