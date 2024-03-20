@@ -9,8 +9,8 @@ from captcha_competition import ConfigKeys, load_config, MODELS_PATH
 from captcha_competition.training import trainer_factory
 
 
-DEFAULT_CONFIG_FILENAME = "resnet-transformer-6-finetune.yaml"
-MODEL_NAME = "resnet-transformer-6"
+DEFAULT_CONFIG_FILENAME = "resnet-transformer-2-finetune.yaml"
+MODEL_NAME = "resnet-transformer-2"
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
