@@ -13,6 +13,11 @@ from captcha_competition.training import (
     CustomAccuracyMetric,
 )
 
+MAPPING = {
+    10: "a",
+    11: "e",
+    12: "u",
+}
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
@@ -60,7 +65,7 @@ def create_submission_file(config_filename: str):
             predictions_list = predictions.tolist()
             all_predictions_list.extend(predictions_list)
     all_predictions_list = [
-        "".join(map(str, pred)) for pred in all_predictions_list
+        "".join(map(_to_char, pred)) for pred in all_predictions_list
     ]
     # Create submission file
     test_path = Path(test_dataloader.dataset.raw_img_dir)  # type: ignore[union-attr]
@@ -72,6 +77,13 @@ def create_submission_file(config_filename: str):
     submission_df.to_csv(
         DATA_PATH / f"{config_filename.split('.')[0]}.csv", index=False
     )
+
+
+def _to_char(label: int) -> str:
+    if label < 10:
+        return str(label)
+    else:
+        return MAPPING[label]
 
 
 def _get_images_ids(folder_path: Path) -> list[str]:

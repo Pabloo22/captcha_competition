@@ -15,7 +15,11 @@ from captcha_competition.data.preprocessing_pipelines import (
     image_to_tensor,
 )
 
-
+MAPPING = {
+    "a": 10,
+    "e": 11,
+    "u": 12,
+}
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
@@ -62,7 +66,9 @@ class CaptchaDataset(Dataset):
         return len(self.img_labels)
 
     def __getitem__(self, idx):
-        img_name = str(self.img_labels.iloc[idx, 0]).zfill(self.zero_pad) + ".png"
+        img_name = (
+            str(self.img_labels.iloc[idx, 0]).zfill(self.zero_pad) + ".png"
+        )
         raw_img_path = os.path.join(self.raw_img_dir, img_name)
         processed_img_path = os.path.join(self.processed_img_dir, img_name)
 
@@ -93,11 +99,18 @@ class CaptchaDataset(Dataset):
             image_tensor = image_tensor.to(DEVICE)
         return image_tensor
 
+    @staticmethod
+    def _to_int(label: str) -> int:
+        if label.isdigit():
+            return int(label)
+        return MAPPING[label]
+
     def _get_label_tensor(self, idx):
         if self.img_labels is None:
             return None
         label = self.img_labels.iloc[idx, 1]
-        label = [int(i) for i in str(label).zfill(6)]
+
+        label = [self._to_int(i) for i in str(label).zfill(self.zero_pad)]
         return label_to_tensor(label)
 
 
