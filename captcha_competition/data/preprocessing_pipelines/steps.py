@@ -142,6 +142,44 @@ def remove_only_background_tensor(tensor: torch.Tensor) -> torch.Tensor:
     return new_tensor
 
 
+def preprocessing_tensor(image: torch.Tensor) -> torch.Tensor:
+    # Convert the image to grayscale
+    image = torch.mean(image, dim=2, keepdim=True)
+
+    # Divide the image into 10x10 windows.
+    windows = image.unfold(0, 10, 10).unfold(1, 10, 10)
+
+    # Reshape windows to match numpy's behavior
+    windows = windows.permute(0, 1, 3, 4, 2).reshape(-1, 10, 10)
+
+    # Calculate the most common color in each window.
+    color_counter = torch.tensor(
+        [torch.bincount(window.flatten(), minlength=256) for window in windows]
+    )
+
+    # Calculate the most common color in the image.
+    color_mode = torch.tensor(
+        [value for value, _ in torch.sum(color_counter, dim=0).topk(2)[0]]
+    )
+
+    # Copy the image
+    new_image = image.clone()
+
+    # Change everything that is not the second most common color (text) to 
+    # the first most common color (background)
+    new_image[new_image != color_mode[1]] = color_mode[0]
+
+    # Convert the image to binary
+    threshold_value = (
+        color_mode[0] if color_mode[0] > color_mode[1] else color_mode[1]
+    )
+    new_image = torch.where(
+        new_image > threshold_value, torch.tensor(255), torch.tensor(0)
+    ).byte()
+
+    return new_image
+
+
 # --- Helper functions ---
 
 

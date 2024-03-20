@@ -15,6 +15,7 @@ from captcha_competition.data.preprocessing_pipelines import (
     min_max_normalize_tensor,
     resize_tensor,
     remove_only_background_tensor,
+    preprocessing_tensor,
 )
 
 
@@ -36,6 +37,7 @@ STEPS: dict[str, Callable[[Any], Any]] = {
         resize_tensor, height=80, width=210
     ),
     "remove_only_background_tensor": remove_only_background_tensor,
+    "preprocessing_tensor": preprocessing_tensor,
 }
 
 
