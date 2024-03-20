@@ -19,7 +19,8 @@ from captcha_competition.training import (
     CustomAccuracyMetric,
 )
 
-SUBMISSION_FILENAME = "compe-8-1.yaml"
+SUBMISSION_FILENAME = "resnet-transformer-6-finetune.yaml"
+MODEL_NAME = "resnet-transformer-6"
 MAPPING = {
     10: "a",
     11: "e",
@@ -39,12 +40,12 @@ def create_submission_file(config_filename: str):
         val_dataset_params=config[ConfigKeys.VAL_DATASET],
         dataloader_params=config[ConfigKeys.DATALOADER],
         trainer_params=config[ConfigKeys.TRAINER],
-        model_name=config_filename.split(".")[0],
+        model_name=MODEL_NAME,
     )
 
     model = trainer.model
 
-    pt_filename = MODELS_PATH / f"{config_filename.split('.')[0]}.pt"
+    pt_filename = MODELS_PATH / f"{MODEL_NAME}.pt"
 
     model.load_state_dict(torch.load(pt_filename)["model_state_dict"])
     model = model.to(DEVICE)
@@ -109,7 +110,6 @@ def create_test_csv():
 
 
 if __name__ == "__main__":
-    # create_submission_file(SUBMISSION_FILENAME)
-    # print("Submission file created")
-    create_test_csv()
-
+    create_submission_file(SUBMISSION_FILENAME)
+    print("Submission file created")
+    # create_test_csv()

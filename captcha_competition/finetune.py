@@ -9,7 +9,8 @@ from captcha_competition import ConfigKeys, load_config, MODELS_PATH
 from captcha_competition.training import trainer_factory
 
 
-DEFAULT_CONFIG_FILENAME = "resnet-transformer-4.yaml"
+DEFAULT_CONFIG_FILENAME = "resnet-transformer-6-finetune.yaml"
+MODEL_NAME = "resnet-transformer-6"
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -30,7 +31,7 @@ def main(config_filename: Optional[str] = None):
         config_filename = get_configuration_filename()
     config = load_config(config_filename)
 
-    wandb.init(project="captcha_competition_tuesday", config=config)
+    wandb.init(project="competition", config=config)
 
     # The name is the name of the configuration file without the extension
     model_name = config_filename.split(".")[0]
@@ -45,16 +46,18 @@ def main(config_filename: Optional[str] = None):
         val_dataset_params=config[ConfigKeys.VAL_DATASET],
         dataloader_params=config[ConfigKeys.DATALOADER],
         trainer_params=config[ConfigKeys.TRAINER],
-        model_name=model_name,
+        model_name=MODEL_NAME,
     )
     model = trainer.model
-    pt_filename = MODELS_PATH / f"{config_filename.split('.')[0]}.pt"
+    pt_filename = MODELS_PATH / f"{MODEL_NAME}.pt"
     state = torch.load(pt_filename)
     model.load_state_dict(torch.load(pt_filename)["model_state_dict"])
+    embedding_size = model.embedding_size
+    model.fc = torch.nn.Linear(embedding_size, 13)
     model = model.to(DEVICE)
     trainer.model = model
 
-    trainer.best_eval_accuracy = state["val_accuracy"]
+    # trainer.best_eval_accuracy = state["val_accuracy"]
     optimizer = trainer.optimizer
     optimizer.load_state_dict(state["optimizer_state_dict"])
 
