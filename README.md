@@ -31,7 +31,7 @@ Team Name: **DeepLayer**
 ## Our Approach: Best Submission
 
 ### Model Architecture
-During the preparation phase, we pre-trained a Vision Transformer (ViT) on a synthetic dataset of captchas (1M images), with the following architecture:
+During the preparation phase, we pre-trained a Convolutional Vision Transformer on a synthetic dataset of captchas (1M images), with the following architecture:
 
 ```
  ===============================================================================================
