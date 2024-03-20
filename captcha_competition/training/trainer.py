@@ -66,13 +66,16 @@ class Trainer:
         self.num_samples = num_samples
 
         if self.use_wandb:
-            wandb.watch(self.model, criterion=self.criterion, log="all", log_freq=10)
+            wandb.watch(
+                self.model, criterion=self.criterion, log="all", log_freq=10
+            )
 
     def train(self) -> None:
         for epoch in range(self.epochs):
             self.model.train()
             losses = [0.0] * len(self.train_dataloader_handler)
             self.accuracy_metric.reset()
+            self.accuracy_metric_per_digit.reset()
             for batch_idx, (images, labels) in enumerate(
                 self.train_dataloader_handler, start=0
             ):
@@ -119,6 +122,7 @@ class Trainer:
         self.model.eval()
         losses = []
         self.accuracy_metric.reset()
+        self.accuracy_metric_per_digit.reset()
 
         incorrect_images = []
         incorrect_preds = []
@@ -130,6 +134,7 @@ class Trainer:
                 loss = self.criterion(outputs, labels)
                 losses.append(loss.item())
                 self.accuracy_metric.update(outputs, labels)
+                self.accuracy_metric_per_digit.update(outputs, labels)
 
                 if len(incorrect_images) < self.num_samples and self.use_wandb:
                     self._update_incorrect_images(
