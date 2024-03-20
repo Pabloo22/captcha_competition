@@ -8,7 +8,7 @@ from captcha_competition import ConfigKeys, load_config
 from captcha_competition.training import trainer_factory
 
 
-DEFAULT_CONFIG_FILENAME = "resnet-transformer-2.yaml"
+DEFAULT_CONFIG_FILENAME = "resnet-transformer-4.yaml"
 
 
 def get_configuration_filename() -> str:
