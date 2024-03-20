@@ -4,7 +4,13 @@ import torch
 import pandas as pd
 import tqdm  # type: ignore[import-untyped]
 
-from captcha_competition import ConfigKeys, load_config, MODELS_PATH, DATA_PATH
+from captcha_competition import (
+    ConfigKeys,
+    load_config,
+    MODELS_PATH,
+    DATA_PATH,
+    DATA_RAW_PATH,
+)
 from captcha_competition.training import (
     trainer_factory,
     dataset_factory,
@@ -13,6 +19,7 @@ from captcha_competition.training import (
     CustomAccuracyMetric,
 )
 
+SUBMISSION_FILENAME = "compe-8-1.yaml"
 MAPPING = {
     10: "a",
     11: "e",
@@ -45,6 +52,7 @@ def create_submission_file(config_filename: str):
     preprocessing_fc = preprocessing_fc_factory(
         model_type=trainer.model_type, **config[ConfigKeys.PREPROCESSING]
     )
+
     test_dataset = dataset_factory(
         preprocessing_fc=preprocessing_fc, **config[ConfigKeys.TEST_DATASET]
     )
@@ -82,16 +90,26 @@ def create_submission_file(config_filename: str):
 def _to_char(label: int) -> str:
     if label < 10:
         return str(label)
-    else:
-        return MAPPING[label]
+
+    return MAPPING[label]
 
 
 def _get_images_ids(folder_path: Path) -> list[str]:
     return sorted(
-        [image_path.stem for image_path in folder_path.glob("*.png")]
+        [int(image_path.stem) for image_path in folder_path.glob("*.png")]
     )
 
 
+def create_test_csv():
+    # Create a test.csv file in DATA_RAW_PATH with dummy labels (000000)
+    ids = list(range(0, 2500))
+    labels = ["000000"] * 2500
+    test_df = pd.DataFrame({"Id": ids, "Label": labels})
+    test_df.to_csv(DATA_RAW_PATH / "test.csv", index=False)
+
+
 if __name__ == "__main__":
-    create_submission_file("resnet-3.yaml")
-    print("Submission file created")
+    # create_submission_file(SUBMISSION_FILENAME)
+    # print("Submission file created")
+    create_test_csv()
+

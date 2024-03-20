@@ -40,6 +40,11 @@ val_dataset:
   dataset_type: "real"  # Can be "real" or "synthetic"
   folder_name: "validation_kaggle"  # Picks all the images from this folder and the .csv file with the same name.
   only_tensors: true
+test_dataset:
+  remove_previously_processed: true
+  dataset_type: "real"  # Can be "real" or "synthetic"
+  folder_name: "test"  # Picks all the images from this folder and the .csv file with the same name.
+  only_tensors: true
 dataloader:
   batch_size: 128
   shuffle: true

@@ -63,6 +63,8 @@ class CaptchaDataset(Dataset):
         self.save_processed = save_processed
 
     def __len__(self):
+        if self.img_labels is None:
+            return len(os.listdir(self.raw_img_dir))
         return len(self.img_labels)
 
     def __getitem__(self, idx):
@@ -107,7 +109,8 @@ class CaptchaDataset(Dataset):
 
     def _get_label_tensor(self, idx):
         if self.img_labels is None:
-            return None
+            dummy_tensor = torch.zeros(13, dtype=torch.int64, device=DEVICE)
+            return dummy_tensor
         label = self.img_labels.iloc[idx, 1]
 
         label = [self._to_int(i) for i in str(label).zfill(self.zero_pad)]
