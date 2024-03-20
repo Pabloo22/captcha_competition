@@ -1,5 +1,8 @@
 wandb/
 data/raw/synthetic/
+data/raw/train_kaggle/
+data/raw/validation_kaggle/
+data/raw/test/
 data/processed/train/
 data/processed/validation/
 data/raw/synthetic.csv
