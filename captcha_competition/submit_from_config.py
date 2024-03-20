@@ -19,8 +19,8 @@ from captcha_competition.training import (
     CustomAccuracyMetric,
 )
 
-SUBMISSION_FILENAME = "resnet-transformer-6-finetune.yaml"
-MODEL_NAME = "resnet-transformer-6"
+SUBMISSION_FILENAME = "resnet-transformer-2-finetune.yaml"
+MODEL_NAME = "resnet-transformer-2"
 MAPPING = {
     10: "a",
     11: "e",
@@ -32,6 +32,8 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 def create_submission_file(config_filename: str):
     config = load_config(config_filename)
 
+    model_params = config[ConfigKeys.MODEL]
+    model_params["num_classes"] = 13
     trainer = trainer_factory(
         model_params=config[ConfigKeys.MODEL],
         optimizer_params=config[ConfigKeys.OPTIMIZER],
