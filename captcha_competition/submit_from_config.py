@@ -97,7 +97,7 @@ def _to_char(label: int) -> str:
     return MAPPING[label]
 
 
-def _get_images_ids(folder_path: Path) -> list[str]:
+def _get_images_ids(folder_path: Path) -> list[int]:
     return sorted(
         [int(image_path.stem) for image_path in folder_path.glob("*.png")]
     )
