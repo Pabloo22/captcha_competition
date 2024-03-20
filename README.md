@@ -158,6 +158,6 @@ poetry add <package>
 
 ## Notes
 
-- When installing everything remember to cahnge the environment path to your own computer.
+- When installing everything remember to change the environment path to your own computer.
 
 
