@@ -20,6 +20,7 @@ class ResNetTransformer(nn.Module):
         num_layers: int = 2,
         dropout: float = 0.1,
         batch_first: bool = False,
+        num_classes: int = NUM_CLASSES,
     ):
         super().__init__()
         self.embedding_size = embedding_size
@@ -82,7 +83,7 @@ class ResNetTransformer(nn.Module):
             enable_nested_tensor=False,
         )
 
-        self.fc = nn.Linear(embedding_size, NUM_CLASSES)
+        self.fc = nn.Linear(embedding_size, num_classes)
 
         self.softmax = nn.LogSoftmax(dim=-1)
 
