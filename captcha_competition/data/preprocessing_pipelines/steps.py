@@ -114,6 +114,7 @@ def remove_background(img: np.ndarray) -> np.ndarray:
 
 def remove_background_tensor(tensor: torch.Tensor) -> torch.Tensor:
     numbers_color = get_numbers_color_tensor(tensor)
+    numbers_color = numbers_color.unsqueeze(1).unsqueeze(2).expand_as(tensor)
     mask = torch.all(tensor == numbers_color, dim=0)
     mask = torch.stack([mask, mask, mask], dim=0)
     new_tensor = tensor * mask
@@ -188,6 +189,8 @@ def get_numbers_color(img: np.ndarray):
     colors, _ = get_most_common_colors(img, n=2)
 
     first_color, second_color = colors
+    first_color = first_color.reshape(1, 1, 3)
+    second_color = second_color.reshape(1, 1, 3)
     if np.all(first_color == background_color):
         return second_color
     return first_color
