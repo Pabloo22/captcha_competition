@@ -166,7 +166,7 @@ def preprocessing_tensor(image: torch.Tensor) -> torch.Tensor:
     # Copy the image
     new_image = image.clone()
 
-    # Change everything that is not the second most common color (text) to 
+    # Change everything that is not the second most common color (text) to
     # the first most common color (background)
     new_image[new_image != color_mode[1]] = color_mode[0]
 
@@ -179,6 +179,41 @@ def preprocessing_tensor(image: torch.Tensor) -> torch.Tensor:
     ).byte()
 
     return new_image
+
+
+def keep_top_colors_tensor(
+    tensor: torch.Tensor, n: int = 5
+) -> torch.Tensor:
+    """
+    Sets pixels that are not among the top n most common colors to zero.
+
+    Parameters:
+    - tensor: The input tensor.
+    - n: The number of top common colors to retain.
+
+    Returns:
+    - A tensor with all but the top n most common colors set to zero.
+    """
+    # Get the top n most common colors and their counts
+    top_colors, _ = get_most_common_colors_tensor(tensor, n=n)
+
+    # Initialize a mask of zeros with the same shape as the tensor
+    mask = torch.zeros_like(tensor, dtype=torch.bool)
+
+    # Iterate through the top n colors and update the mask
+    for color in top_colors:
+        # Expand color to match tensor dimensions for broadcasting
+        color_expanded = color.unsqueeze(1).unsqueeze(2).expand_as(tensor)
+        # Update the mask to True where the tensor matches one of the top n colors
+        mask |= torch.all(tensor == color_expanded, dim=0)
+
+    # Stack the mask to match the tensor's shape for application
+    mask_stacked = torch.stack([mask, mask, mask], dim=0)
+
+    # Apply the mask to the tensor, setting non-top n colors to zero
+    new_tensor = tensor * mask_stacked
+
+    return new_tensor
 
 
 # --- Helper functions ---

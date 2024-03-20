@@ -18,6 +18,7 @@ from captcha_competition.data.preprocessing_pipelines.steps import (
     get_most_common_colors_tensor,
     remove_only_background_tensor,
     preprocessing_tensor,
+    keep_top_colors_tensor,
 )
 
 from captcha_competition.data.preprocessing_pipelines.pipelines import (
