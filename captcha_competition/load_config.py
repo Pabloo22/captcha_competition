@@ -14,6 +14,7 @@ class ConfigKeys(str, Enum):
     PREPROCESSING = "preprocessing"
     TRAIN_DATASET = "train_dataset"
     VAL_DATASET = "val_dataset"
+    TEST_DATASET = "test_dataset"
     DATALOADER = "dataloader"
 
 

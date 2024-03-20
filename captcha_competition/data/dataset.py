@@ -48,9 +48,12 @@ class CaptchaDataset(Dataset):
             for img_name in os.listdir(self.processed_img_dir):
                 os.remove(os.path.join(self.processed_img_dir, img_name))
 
-        self.img_labels = pd.read_csv(
-            os.path.join(raw_data_dir, f"{folder_name}.csv")
-        )
+        labels_path = os.path.join(raw_data_dir, f"{folder_name}.csv")
+        # Check if exists
+        if os.path.exists(labels_path):
+            self.img_labels = pd.read_csv(labels_path)
+        else:
+            self.img_labels = None  # type: ignore[assignment]
 
         self.preprocessing_fc = preprocessing_fc
         self.save_processed = save_processed
@@ -91,6 +94,8 @@ class CaptchaDataset(Dataset):
         return image_tensor
 
     def _get_label_tensor(self, idx):
+        if self.img_labels is None:
+            return None
         label = self.img_labels.iloc[idx, 1]
         label = [int(i) for i in str(label).zfill(6)]
         return label_to_tensor(label)
