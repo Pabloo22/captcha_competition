@@ -1,11 +1,13 @@
 wandb/
 data/raw/synthetic/
+data/raw/synthetic_competition/
 data/raw/train_kaggle/
 data/raw/validation_kaggle/
 data/raw/test/
 data/processed/train/
 data/processed/validation/
 data/raw/synthetic.csv
+data/raw/synthetic_competition.csv
 # models/*.pt
 # Byte-compiled / optimized / DLL files
 __pycache__/

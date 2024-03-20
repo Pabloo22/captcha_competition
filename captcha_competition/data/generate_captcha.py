@@ -22,7 +22,10 @@ DIFF_BETWEEN_BACKGROUND_AND_NUMBER_COLORS = 40
 
 NUMBER_OF_RANDOM_DOTS = (50, 100)
 NUMBER_OF_RANDOM_LINES = (10, 20)
-NUMBER_OF_RANDOM_CIRCLES = (1, 5)
+NUMBER_OF_RANDOM_CIRCLES = (1, 3)
+
+MAPPING = {10: "a", 11: "e", 12: "u"}
+INV_MAPPING = {"a": 10, "e": 11, "u": 12}
 
 
 def generate_captcha_image() -> tuple[np.ndarray, list[int]]:
@@ -81,6 +84,84 @@ def generate_captcha_image() -> tuple[np.ndarray, list[int]]:
     return np.array(image), numbers
 
 
+def _to_str(number: int) -> str:
+    if number in MAPPING:
+        return MAPPING[number]
+    return str(number)
+
+
+def generate_captcha_image_competition() -> tuple[np.ndarray, list[int]]:
+    # Create a blank image with white background
+    background_color = tuple(np.random.choice(range(256), size=3))
+    image = Image.new("RGB", (WIDTH, HEIGHT), color=background_color)  # type: ignore
+    draw = ImageDraw.Draw(image)
+
+    segment_width = WIDTH // NUM_NUMBERS
+    numbers = []
+
+    y = random.randint(-Y_MAXIMUM_OFFSET, Y_MAXIMUM_OFFSET)
+    # Generate and draw random numbers
+    for i in range(NUM_NUMBERS):
+        font = load_random_font()
+        number = random.randint(0, 12)
+        numbers.append(number)
+
+        # Random rotation and thickness for each character
+        angle = random.randint(-30, 30)
+        thickness = random.randint(1, 3)
+        numbers_color = tuple(np.random.choice(range(256), size=3))
+        while (
+            np.abs(np.array(numbers_color) - np.array(background_color)).sum()
+            < DIFF_BETWEEN_BACKGROUND_AND_NUMBER_COLORS
+        ):
+            numbers_color = tuple(np.random.choice(range(256), size=3))
+
+        x = i * segment_width
+        draw.text(
+            (x, y),
+            _to_str(number),
+            fill=numbers_color,
+            font=font,
+            # align="center",
+            # anchor="mm",
+            rotation=angle,
+            # features=["kern"],
+            stroke_width=thickness,
+        )  # type: ignore
+
+    # Add random dots
+    for _ in range(random.randint(*NUMBER_OF_RANDOM_DOTS)):
+        position = (random.randint(0, WIDTH), random.randint(0, HEIGHT))
+        numbers_color = tuple(np.random.choice(range(256), size=3))
+        draw.point(position, fill=numbers_color)  # type: ignore
+
+    # Add random lines
+    for _ in range(random.randint(*NUMBER_OF_RANDOM_LINES)):
+        start_position = (random.randint(0, WIDTH), random.randint(0, HEIGHT))
+        end_position = (random.randint(0, WIDTH), random.randint(0, HEIGHT))
+        numbers_color = tuple(np.random.choice(range(256), size=3))
+        draw.line([start_position, end_position], fill=numbers_color, width=1)  # type: ignore
+
+    # Add random circles
+    for _ in range(random.randint(*NUMBER_OF_RANDOM_CIRCLES)):
+        top_left = (
+            random.randint(0, WIDTH),
+            random.randint(0, HEIGHT - 20),
+        )
+        bottom_right = (
+            top_left[0] + random.randint(10, 30),
+            top_left[1] + random.randint(10, 30),
+        )
+        numbers_color = tuple(np.random.choice(range(256), size=3))
+        draw.ellipse(
+            [top_left, bottom_right], outline=numbers_color, fill=numbers_color  # type: ignore
+        )
+    for i, number in enumerate(numbers):
+        if number in INV_MAPPING:
+            numbers[i] = INV_MAPPING[number]
+    return np.array(image), numbers
+
+
 def load_random_font(
     fonts_dir=FONTS_PATH, size=FONT_SIZE
 ) -> ImageFont.FreeTypeFont:
@@ -107,21 +188,25 @@ if __name__ == "__main__":
     import pandas as pd
     import tqdm  # type: ignore
 
-    num_images = 1_000_000
+    num_images = 100
     labels: list[tuple[int, str]] = []
     # Create DATA_RAW_PATH / "synthetic" directory if it does not exis
     # DATA_RAW_PATH = Path(
     #     "/home/pablo/VSCodeProjects/captcha_competition/data/raw/"
     # )
-    print(DATA_RAW_PATH / "synthetic")
-    os.makedirs(DATA_RAW_PATH / "synthetic", exist_ok=True)
+    print(DATA_RAW_PATH / "synthetic_competition")
+    os.makedirs(DATA_RAW_PATH / "synthetic_competition", exist_ok=True)
 
     try:
         for i_ in tqdm.trange(num_images):
-            image_, numbers_ = generate_captcha_image()
-            image_path = DATA_RAW_PATH / "synthetic" / f"{i_:07}.png"
+            image_, numbers_ = generate_captcha_image_competition()
+            image_path = (
+                DATA_RAW_PATH / "synthetic_competition" / f"{i_:07}.png"
+            )
             Image.fromarray(image_).save(image_path)
             labels.append((i_, "".join(map(str, numbers_))))
     finally:
         labels_df = pd.DataFrame(labels, columns=["Id", "Label"])
-        labels_df.to_csv(DATA_RAW_PATH / "synthetic.csv", index=False)
+        labels_df.to_csv(
+            DATA_RAW_PATH / "synthetic_competition.csv", index=False
+        )
