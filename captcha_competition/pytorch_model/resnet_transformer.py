@@ -18,6 +18,8 @@ class ResNetTransformer(nn.Module):
         embedding_size: int = 128,
         n_head: int = 2,
         num_layers: int = 2,
+        dropout: float = 0.1,
+        batch_first: bool = False,
     ):
         super().__init__()
         self.embedding_size = embedding_size
@@ -69,7 +71,10 @@ class ResNetTransformer(nn.Module):
         )
 
         self.encoder_layer = nn.TransformerEncoderLayer(
-            d_model=embedding_size, nhead=n_head, batch_first=True
+            d_model=embedding_size,
+            nhead=n_head,
+            batch_first=batch_first,
+            dropout=dropout,
         )
         self.transformer_encoder = nn.TransformerEncoder(
             self.encoder_layer,
