@@ -21,7 +21,6 @@ preprocessing:
   # If true, equivalent to:
   preprocessing_steps:
     - "remove_only_background_tensor"
-    - "keep_top_colors_tensor"
     - "resize_resnet_tensor"
   # If false, equivalent to:
   # preprocessing_steps:
