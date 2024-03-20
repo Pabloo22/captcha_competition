@@ -19,8 +19,8 @@ from captcha_competition.training import (
     CustomAccuracyMetric,
 )
 
-SUBMISSION_FILENAME = "resnet-transformer-2-finetune.yaml"
-MODEL_NAME = "resnet-transformer-2"
+SUBMISSION_FILENAME = "resnet-transformer-82-finetune.yaml"
+MODEL_NAME = "resnet-transformer-8"
 MAPPING = {
     10: "a",
     11: "e",
