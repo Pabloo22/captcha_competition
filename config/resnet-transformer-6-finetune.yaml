@@ -7,6 +7,7 @@ model:
   initial_filters: 64
   multiplier: 2
   n_head: 4
+  num_classes: 13
 
 optimizer:
   learning_rate: 0.0001
