@@ -15,8 +15,6 @@ Example of the captchas from the first phase:
 
 ![2dn phase example](data/raw/test/00000.png)
 
-
-
 ## Results: 1st Position! 🏆
 
 ![ranking](ranking.jpeg)
@@ -91,20 +89,19 @@ During the preparation phase, we pre-trained a Convolutional Vision Transformer 
    Non-trainable params: 0
 ```
 
-For additional details on the hyper-parameters chosen, please refer to its [configuration](config/resnet-transformer-6.yaml) file.
+Its configuration file is [resnet-transformer-6.yaml](config/resnet-transformer-6.yaml).
 
-For the script that generated the synthetic dataset, please refer to the [generate_synthetic_dataset.py](captcha_competition/data/generate_captcha.py) file. Other relevant scripts are:
-- [resnet_transformer.py](captcha_competition/pytorch_model/resnet_transformer.py)
+For the script that generated the synthetic dataset, please take a look at the [generate_captcha.py](captcha_competition/data/generate_captcha.py) file. The script with the model architecture is [resnet_transformer.py](captcha_competition/pytorch_model/resnet_transformer.py).
 
 ### Preprocessing
-One important detail is that, in order to help the model, we preprocessed the images by removing the background, and the image was resized from 80x200 to 64x192. The resizing was done so that the last layer of the model could be a multiple of 6, which is the number of characters in the captcha.
+One important detail is that, to help the model, we preprocessed the images by removing the background, and the image was resized from 80x200 to 64x192. The resizing was done so that the last layer of the model could be a multiple of 6, which is the number of characters in the captcha.
 
 The resulting images looked like this:
 
 ![incorrect](incorrect_image_390_pre_training.png)
 
 ## Pre-training
-We trained for a total of 1117 epochs, each epoch consisted of 5 batches of 64 images. The model was trained using the AdamW optimizer with a learning rate of 0.0001. The loss function used was the negative log-likelihood loss, applied to the output of the model. We kept the best model weights based on the validation accuracy, which happened at epoch 390, with an accuracy of 87.1%.
+We trained for a total of 1117 epochs, each epoch consisted of 5 batches of 64 images. The model was trained using the AdamW optimizer with a learning rate of 0.0001. The loss function used was the negative log-likelihood loss, applied to the model's output. We kept the best model weights based on the validation accuracy, which happened at epoch 390, with an accuracy of 87.1%.
 
 Relevant script:
 - [train.py](captcha_competition/train.py)
@@ -113,7 +110,9 @@ Relevant script:
 
 During the competition, we fine-tuned the model using the new captchas. We used the same optimizer (with the same state too) and loss function as in the pre-training phase. However, we had to change the final layer of the model to have 13 outputs to account for the new characters ("a", "e" and "u"). The best model weights were kept based on the validation accuracy too, which, in this case, happened at epoch 10, with an accuracy of around 0.92.
 
-Applying, the same preprocessing, we fine-tuned the model for 5 epochs since the training dataset only had 10,000 images and we reached nearly 100% accuracy in training at this point. The best model weights were kept based on the validation accuracy, which happened at epoch 4, with an accuracy of around 95.4%.
+Applying, the same preprocessing, we fine-tuned the model for 5 epochs since the training dataset only had 10,000 images and we reached nearly 100% accuracy in training. The best model weights were kept based on the validation accuracy, which happened at epoch 4, with an accuracy of around 95.4%. 
+
+Using a pre-trained model was critical to compensate for the lack of data. Without undergoing fine-tuning, the same model achieved an accuracy of only 54% on the test dataset.
 
 Relevant scripts:
 - [finetune.py](captcha_competition/finetune.py)
@@ -121,11 +120,11 @@ Relevant scripts:
 
 
 ## Project structure
-The project structure of the project is based on the [Cookiecutter Data Science](https://drivendata.github.io/cookiecutter-data-science/) template.
+The project structure is based on the [Cookiecutter Data Science](https://drivendata.github.io/cookiecutter-data-science/) template.
 
 Main details of the project structure:
 - Notebooks are used for exploratory data analysis, prototyping, visualizations, and debugging.
-- The `captcha_competition` directory contains the source code of the project, and some scripts to run the training and evaluation of the models.
+- The `captcha_competition` directory contains the source code, and some scripts to run the training and evaluation of the models.
 - The `data` directory contains the raw and processed data.
 - The `models` directory contains the trained models.
 - Hyperparameters and configurations are stored in the `config` directory as `.yaml` files.
@@ -156,8 +155,7 @@ For adding new dependencies, use:
 poetry add <package>
 ```
 
-## Notes
-
-- When installing everything remember to change the environment path to your own computer.
+###  Note
+Remember to change the environment path to your computer.
 
 
